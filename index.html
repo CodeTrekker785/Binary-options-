@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Binary Options | Crypto Mining</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Binary Options</h1>
+    <p>Earn Bitcoin & Ethereum through our smart mining platform.</p>
 
+    <div class="card">
+      <h2>BTC Mining Plan</h2>
+      <p>Start with 1 BTC → Earn 0.0125 BTC/hr</p>
+      <button onclick="startMining('BTC')">Start BTC Mining</button>
+    </div>
+
+    <div class="card">
+      <h2>ETH Mining Plan</h2>
+      <p>Start with $1000 → Earn $300/hr</p>
+      <button onclick="startMining('ETH')">Start ETH Mining</button>
+    </div>
+
+    <p class="note">Payouts every hour | Fully automated</p>
+  </div>
+
+  <script>
+    function startMining(coin) {
+      alert(`${coin} Mining started! Please wait for your rewards.`);
+    }
+  </script>
+</body>
+</html>
