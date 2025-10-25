@@ -11,4 +11,4 @@ It offers real-time market data, trading tools, and insights to help users make 
 - 📊 Interactive trading charts and analytics  
 - 🔒 Secure and responsive design  
 - 💰 User-friendly investment dashboard  
-- 🕒 24/7 market updates 
+- 🕒 24/7 market updates
