@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         /* Custom scrollbar for dark mode */
         ::-webkit-scrollbar {
@@ -102,7 +105,7 @@
         <aside class="col-span-12 lg:col-span-3 bg-slate-800/50 border border-slate-800 rounded-lg overflow-hidden flex flex-col">
             <h2 class="text-lg font-semibold text-white p-4 border-b border-slate-700">Markets</h2>
             <div class="p-4">
-                <input type="text" placeholder="Search markets..." class="form-input">
+                <input type="text" placeholder="Search markets..." class="form-input" id="market-search">
             </div>
             <div class="flex-grow overflow-y-auto">
                 <table class="w-full text-left text-sm">
@@ -136,9 +139,9 @@
                         <div id="current-change-display" class="text-sm text-green-500">+2.35%</div>
                     </div>
                 </div>
-                <!-- Chart Placeholder -->
-                <div class="flex-grow flex items-center justify-center">
-                    <p class="text-slate-500">Trading chart would load here.</p>
+                <!-- Chart Canvas -->
+                <div class="flex-grow p-4">
+                    <canvas id="price-chart" class="w-full h-full"></canvas>
                 </div>
             </section>
             
@@ -164,19 +167,19 @@
                     <!-- Price (Limit Only) -->
                     <div id="price-input-group" class="hidden">
                         <label for="price" class="block text-sm font-medium text-slate-300 mb-1">Price (USD)</label>
-                        <input type="number" id="price" name="price" class="form-input" placeholder="0.00">
+                        <input type="number" id="price" name="price" class="form-input" placeholder="0.00" step="any">
                     </div>
                     
                     <!-- Amount -->
                     <div>
                         <label for="amount" class="block text-sm font-medium text-slate-300 mb-1">Amount (BTC)</label>
-                        <input type="number" id="amount" name="amount" class="form-input" placeholder="0.0000">
+                        <input type="number" id="amount" name="amount" class="form-input" placeholder="0.0000" step="any">
                     </div>
                     
                     <!-- Total -->
                     <div>
                         <label for="total" class="block text-sm font-medium text-slate-300 mb-1">Total (USD)</label>
-                        <input type="number" id="total" name="total" class="form-input" placeholder="0.00">
+                        <input type="number" id="total" name="total" class="form-input" placeholder="0.00" step="any">
                     </div>
                     
                     <!-- Submit Button -->
@@ -276,46 +279,56 @@
             <!-- Modal Body -->
             <div class="p-6 space-y-4">
                 <p class="text-sm text-slate-400">Choose your wallet provider to connect.</p>
-                <button class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                <button id="connect-metamask" class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
                     <img src="https://placehold.co/40x40/334155/e2e8f0?text=M" alt="MetaMask" class="h-10 w-10 rounded-full mr-4">
                     <span class="text-base font-medium text-white">MetaMask</span>
                 </button>
-                <button class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+
+                <!-- Other wallet buttons link to docs (WalletConnect/Coinbase) -->
+                <button id="walletconnect-doc" class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
                     <img src="https://placehold.co/40x40/334155/e2e8f0?text=W" alt="WalletConnect" class="h-10 w-10 rounded-full mr-4">
-                    <span class="text-base font-medium text-white">WalletConnect</span>
+                    <span class="text-base font-medium text-white">WalletConnect (Docs)</span>
                 </button>
-                <button class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                <button id="coinbase-doc" class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
                     <img src="https://placehold.co/40x40/334155/e2e8f0?text=C" alt="Coinbase" class="h-10 w-10 rounded-full mr-4">
-                    <span class="text-base font-medium text-white">Coinbase Wallet</span>
+                    <span class="text-base font-medium text-white">Coinbase Wallet (Docs)</span>
                 </button>
+
+                <div id="wallet-info" class="mt-2 text-sm text-slate-300"></div>
             </div>
         </div>
     </div>
 
-
     <!-- Inline JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
             // --- State ---
             let isBuyMode = true;
             let isMarketOrder = true;
-            let currentMarket = { id: 'BTC/USD', price: 68420.50, change: 2.35 };
+            // currentMarket.id will be like 'BTC/USD'
+            let currentMarket = { id: 'BTC/USD', price: 68420.50, change: 2.35, cgId: 'bitcoin' };
             const markets = [
-                { id: 'BTC/USD', price: 68420.50, change: 2.35 },
-                { id: 'ETH/USD', price: 3450.12, change: 1.78 },
-                { id: 'SOL/USD', price: 172.45, change: -0.52 },
-                { id: 'DOGE/USD', price: 0.165, change: 5.12 },
-                { id: 'LINK/USD', price: 18.30, change: -1.10 },
+                { id: 'BTC/USD', price: 68420.50, change: 2.35, cgId: 'bitcoin' },
+                { id: 'ETH/USD', price: 3450.12, change: 1.78, cgId: 'ethereum' },
+                { id: 'SOL/USD', price: 172.45, change: -0.52, cgId: 'solana' },
+                { id: 'DOGE/USD', price: 0.165, change: 5.12, cgId: 'dogecoin' },
+                { id: 'LINK/USD', price: 18.30, change: -1.10, cgId: 'chainlink' },
             ];
-            
+            // Chart state
+            let priceChart = null;
+            let priceChartData = { labels: [], data: [] };
+
             // --- Selectors ---
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
             const connectWalletBtn = document.getElementById('connect-wallet-btn');
             const walletModal = document.getElementById('wallet-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
-            
+            const connectMetaMaskBtn = document.getElementById('connect-metamask');
+            const walletInfoEl = document.getElementById('wallet-info');
+            const walletConnectDoc = document.getElementById('walletconnect-doc');
+            const coinbaseDoc = document.getElementById('coinbase-doc');
+
             const buyTab = document.getElementById('buy-tab');
             const sellTab = document.getElementById('sell-tab');
             const marketOrderBtn = document.getElementById('market-order-btn');
@@ -328,64 +341,57 @@
             const tradesTab = document.getElementById('trades-tab');
             const orderbookContent = document.getElementById('orderbook-content');
             const tradesContent = document.getElementById('trades-content');
-            
+
             const marketListEl = document.getElementById('market-list');
             const orderbookBidsEl = document.getElementById('orderbook-bids');
             const orderbookAsksEl = document.getElementById('orderbook-asks');
             const tradeHistoryEl = document.getElementById('trade-history');
-            
+
             const currentMarketDisplay = document.getElementById('current-market-display');
             const currentPriceDisplay = document.getElementById('current-price-display');
             const currentChangeDisplay = document.getElementById('current-change-display');
             const orderbookPrice = document.getElementById('orderbook-price');
 
+            const marketSearchInput = document.getElementById('market-search');
+
+            const priceInput = document.getElementById('price');
+            const amountInput = document.getElementById('amount');
+            const totalInput = document.getElementById('total');
+
             // --- Event Listeners ---
-            
-            // Mobile Menu
-            mobileMenuToggle.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-            
-            // Wallet Modal
-            connectWalletBtn.addEventListener('click', () => {
-                walletModal.classList.remove('hidden');
-            });
-            closeModalBtn.addEventListener('click', () => {
-                walletModal.classList.add('hidden');
-            });
-            walletModal.addEventListener('click', (e) => {
-                if (e.target === walletModal) {
-                    walletModal.classList.add('hidden');
-                }
-            });
-            
+            mobileMenuToggle.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            // Wallet modal toggles
+            connectWalletBtn.addEventListener('click', () => walletModal.classList.remove('hidden'));
+            closeModalBtn.addEventListener('click', () => walletModal.classList.add('hidden'));
+            walletModal.addEventListener('click', (e) => { if (e.target === walletModal) walletModal.classList.add('hidden'); });
+
+            connectMetaMaskBtn.addEventListener('click', () => connectMetaMask());
+            walletConnectDoc.addEventListener('click', () => window.open('https://docs.walletconnect.com/','_blank'));
+            coinbaseDoc.addEventListener('click', () => window.open('https://docs.cloud.coinbase.com/wallet-sdk/docs/walletsdk-intro','_blank'));
+
             // Order Form Tabs (Buy/Sell)
-            buyTab.addEventListener('click', () => {
-                setOrderMode(true);
-            });
-            sellTab.addEventListener('click', () => {
-                setOrderMode(false);
-            });
-            
+            buyTab.addEventListener('click', () => setOrderMode(true));
+            sellTab.addEventListener('click', () => setOrderMode(false));
+
             // Order Form Type (Market/Limit)
-            marketOrderBtn.addEventListener('click', () => {
-                setOrderType(true);
-            });
-            limitOrderBtn.addEventListener('click', () => {
-                setOrderType(false);
-            });
-            
+            marketOrderBtn.addEventListener('click', () => setOrderType(true));
+            limitOrderBtn.addEventListener('click', () => setOrderType(false));
+
+            // Sync inputs: amount/price/total
+            amountInput.addEventListener('input', syncTotalFromAmount);
+            totalInput.addEventListener('input', syncAmountFromTotal);
+            priceInput.addEventListener('input', () => { /* when user edits limit price */ });
+
             // Order Form Submission
             orderForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const amount = e.target.elements.amount.value;
-                const price = e.target.elements.price.value;
+                const amount = parseFloat(amountInput.value);
+                const price = isMarketOrder ? currentMarket.price : parseFloat(priceInput.value);
                 const type = isMarketOrder ? 'Market' : 'Limit';
                 const side = isBuyMode ? 'Buy' : 'Sell';
-                
-                // Simple validation
+
                 if (!amount || amount <= 0) {
-                    // In a real app, show a proper message, not alert
                     console.error("Amount must be greater than 0");
                     return;
                 }
@@ -393,86 +399,190 @@
                     console.error("Price must be greater than 0 for limit orders");
                     return;
                 }
-                
-                // Show a confirmation message (not an alert)
+
+                // For demo we simply show UI feedback and push a fake trade into history
                 submitOrderBtn.textContent = 'Order Placed!';
                 setTimeout(() => {
                     submitOrderBtn.textContent = `${isBuyMode ? 'Buy' : 'Sell'} ${currentMarket.id.split('/')[0]}`;
                 }, 2000);
-                
-                orderForm.reset();
-                setOrderType(isMarketOrder); // Reset form state
-            });
-            
-            // Right Sidebar Tabs
-            orderbookTab.addEventListener('click', () => {
-                orderbookContent.classList.remove('hidden');
-                tradesContent.classList.add('hidden');
-                orderbookTab.classList.add('text-white', 'border-blue-500');
-                orderbookTab.classList.remove('text-slate-500');
-                tradesTab.classList.add('text-slate-500');
-                tradesTab.classList.remove('text-white', 'border-blue-500');
-            });
-            tradesTab.addEventListener('click', () => {
-                tradesContent.classList.remove('hidden');
-                orderbookContent.classList.add('hidden');
-                tradesTab.classList.add('text-white', 'border-blue-500');
-                tradesTab.classList.remove('text-slate-500');
-                orderbookTab.classList.add('text-slate-500');
-                orderbookTab.classList.remove('text-white', 'border-blue-500');
+
+                // Add to trade history (simulate immediate fill)
+                prependTrade({
+                    price: price,
+                    amount: amount,
+                    time: new Date().toLocaleTimeString(),
+                    isBuy: isBuyMode
+                });
+
+                // Reset form fields: keep price for limit type
+                if (isMarketOrder) {
+                    orderForm.reset();
+                } else {
+                    amountInput.value = '';
+                    totalInput.value = '';
+                }
+                setOrderType(isMarketOrder);
             });
 
-            // --- Functions ---
-            
+            // Right Sidebar Tabs
+            orderbookTab.addEventListener('click', () => {
+                orderbookContent.classList.remove('hidden'); tradesContent.classList.add('hidden');
+                orderbookTab.classList.add('text-white', 'border-blue-500'); orderbookTab.classList.remove('text-slate-500');
+                tradesTab.classList.add('text-slate-500'); tradesTab.classList.remove('text-white', 'border-blue-500');
+            });
+            tradesTab.addEventListener('click', () => {
+                tradesContent.classList.remove('hidden'); orderbookContent.classList.add('hidden');
+                tradesTab.classList.add('text-white', 'border-blue-500'); tradesTab.classList.remove('text-slate-500');
+                orderbookTab.classList.add('text-slate-500'); orderbookTab.classList.remove('text-white', 'border-blue-500');
+            });
+
+            // Market search filter
+            marketSearchInput.addEventListener('input', updateMarketList);
+
+            // --- Helper functions for wallet ---
+            async function connectMetaMask() {
+                if (!window.ethereum) {
+                    walletInfoEl.innerHTML = `<div class="text-sm text-yellow-300">MetaMask not detected. Please install it: <a class="underline" href="https://metamask.io/" target="_blank">metamask.io</a></div>`;
+                    return;
+                }
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+                    // get balance (wei)
+                    const balanceHex = await window.ethereum.request({ method: 'eth_getBalance', params: [account, 'latest'] });
+                    const ethBalance = weiHexToEth(balanceHex);
+                    walletInfoEl.innerHTML = `<div><strong class="text-white">${shortAddress(account)}</strong><div class="text-slate-400">Balance: ${ethBalance} ETH</div></div>`;
+                    // Close modal after connected
+                    setTimeout(() => walletModal.classList.add('hidden'), 700);
+                    // show in header button
+                    connectWalletBtn.textContent = `${shortAddress(account)}`;
+                } catch (err) {
+                    console.error('MetaMask connect error:', err);
+                    walletInfoEl.innerHTML = `<div class="text-red-400">Connection failed: ${err.message || err}</div>`;
+                }
+            }
+
+            function weiHexToEth(hex) {
+                // hex is like '0x0234...'
+                try {
+                    const wei = BigInt(hex);
+                    const eth = Number(wei) / 1e18;
+                    // rounding to 6 decimals for display
+                    return (Math.round((eth + Number.EPSILON) * 1e6) / 1e6).toString();
+                } catch (e) {
+                    // fallback parsing
+                    return '0';
+                }
+            }
+
+            function shortAddress(addr) {
+                if (!addr) return '';
+                return addr.slice(0,6) + '...' + addr.slice(-4);
+            }
+
+            // --- Order/market UI helpers ---
             function setOrderMode(isBuy) {
                 isBuyMode = isBuy;
                 if (isBuy) {
-                    buyTab.classList.add('text-green-500', 'border-green-500');
-                    buyTab.classList.remove('text-slate-500');
-                    sellTab.classList.add('text-slate-500');
-                    sellTab.classList.remove('text-red-500', 'border-red-500');
-                    submitOrderBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                    submitOrderBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    buyTab.classList.add('text-green-500', 'border-green-500'); buyTab.classList.remove('text-slate-500');
+                    sellTab.classList.add('text-slate-500'); sellTab.classList.remove('text-red-500', 'border-red-500');
+                    submitOrderBtn.classList.add('bg-green-600', 'hover:bg-green-700'); submitOrderBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
                     submitOrderBtn.textContent = `Buy ${currentMarket.id.split('/')[0]}`;
                 } else {
-                    sellTab.classList.add('text-red-500', 'border-red-500');
-                    sellTab.classList.remove('text-slate-500');
-                    buyTab.classList.add('text-slate-500');
-                    buyTab.classList.remove('text-green-500', 'border-green-500');
-                    submitOrderBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                    submitOrderBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    sellTab.classList.add('text-red-500', 'border-red-500'); sellTab.classList.remove('text-slate-500');
+                    buyTab.classList.add('text-slate-500'); buyTab.classList.remove('text-green-500', 'border-green-500');
+                    submitOrderBtn.classList.add('bg-red-600', 'hover:bg-red-700'); submitOrderBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
                     submitOrderBtn.textContent = `Sell ${currentMarket.id.split('/')[0]}`;
                 }
             }
-            
+
             function setOrderType(isMarket) {
                 isMarketOrder = isMarket;
                 if (isMarket) {
-                    marketOrderBtn.classList.add('bg-slate-700', 'text-white');
-                    marketOrderBtn.classList.remove('text-slate-400');
-                    limitOrderBtn.classList.add('text-slate-400');
-                    limitOrderBtn.classList.remove('bg-slate-700', 'text-white');
+                    marketOrderBtn.classList.add('bg-slate-700', 'text-white'); marketOrderBtn.classList.remove('text-slate-400');
+                    limitOrderBtn.classList.add('text-slate-400'); limitOrderBtn.classList.remove('bg-slate-700', 'text-white');
                     priceInputGroup.classList.add('hidden');
+                    // set price input to current market price for convenience (not used in market order)
+                    priceInput.value = currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2);
                 } else {
-                    limitOrderBtn.classList.add('bg-slate-700', 'text-white');
-                    limitOrderBtn.classList.remove('text-slate-400');
-                    marketOrderBtn.classList.add('text-slate-400');
-                    marketOrderBtn.classList.remove('bg-slate-700', 'text-white');
+                    limitOrderBtn.classList.add('bg-slate-700', 'text-white'); limitOrderBtn.classList.remove('text-slate-400');
+                    marketOrderBtn.classList.add('text-slate-400'); marketOrderBtn.classList.remove('bg-slate-700', 'text-white');
                     priceInputGroup.classList.remove('hidden');
+                    // prefill price with currentPrice
+                    priceInput.value = currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2);
                 }
             }
 
+            function syncTotalFromAmount() {
+                const amount = parseFloat(amountInput.value || 0);
+                const price = isMarketOrder ? currentMarket.price : parseFloat(priceInput.value || currentMarket.price);
+                if (amount && price) {
+                    totalInput.value = (amount * price).toFixed(6).replace(/\.?0+$/,"");
+                } else {
+                    totalInput.value = '';
+                }
+            }
+            function syncAmountFromTotal() {
+                const total = parseFloat(totalInput.value || 0);
+                const price = isMarketOrder ? currentMarket.price : parseFloat(priceInput.value || currentMarket.price);
+                if (total && price) {
+                    amountInput.value = (total / price).toFixed(6).replace(/\.?0+$/,"");
+                } else {
+                    amountInput.value = '';
+                }
+            }
+
+            // --- Market UI / Data fetching ---
+            // CoinGecko mapping helper
+            const cgMap = {
+                'BTC/USD': 'bitcoin',
+                'ETH/USD': 'ethereum',
+                'SOL/USD': 'solana',
+                'DOGE/USD': 'dogecoin',
+                'LINK/USD': 'chainlink'
+            };
+
+            // Fetch simple price and 24h change for our tracked coins
+            async function fetchMarketPrices() {
+                try {
+                    const cgIds = Object.values(cgMap).join(',');
+                    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cgIds}&vs_currencies=usd&include_24hr_change=true`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('CoinGecko rate limit or network error');
+                    const data = await res.json();
+                    // update markets array
+                    markets.forEach(m => {
+                        const id = m.cgId || cgMap[m.id];
+                        if (data[id] && data[id].usd !== undefined) {
+                            const oldPrice = m.price;
+                            m.price = data[id].usd;
+                            // CoinGecko returns change in percent
+                            m.change = data[id].usd_24h_change || (m.change || 0);
+                        }
+                    });
+                    // update UI lists
+                    updateMarketList();
+                    // update selected market display
+                    const selected = markets.find(m => m.id === currentMarket.id);
+                    if (selected) {
+                        currentMarket = selected;
+                        updateChartHeader();
+                    }
+                } catch (err) {
+                    // keep simulated data if fetch fails
+                    console.warn('fetchMarketPrices failed:', err);
+                }
+            }
+
+            // Update market list DOM
             function updateMarketList() {
+                const filter = (marketSearchInput.value || '').toLowerCase();
                 marketListEl.innerHTML = ''; // Clear list
                 markets.forEach(market => {
-                    // Simulate price fluctuation
-                    market.price *= (1 + (Math.random() - 0.495) * 0.005);
-                    market.change += (Math.random() - 0.5) * 0.1;
-                    
+                    if (filter && !market.id.toLowerCase().includes(filter)) return;
                     const isPositive = market.change >= 0;
                     const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
                     const sign = isPositive ? '+' : '';
-                    
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-slate-700/50 cursor-pointer border-b border-slate-700/50';
                     row.innerHTML = `
@@ -482,51 +592,109 @@
                     `;
                     row.addEventListener('click', () => selectMarket(market));
                     marketListEl.appendChild(row);
-                    
-                    if (market.id === currentMarket.id) {
-                        currentMarket = market;
-                        updateChartHeader();
-                    }
                 });
             }
-            
+
             function selectMarket(market) {
                 currentMarket = market;
                 updateChartHeader();
-                setOrderMode(isBuyMode); // Update buy/sell button text
+                setOrderMode(isBuyMode);
+                // fetch fresh chart data for this market
+                fetchAndUpdateChart(currentMarket.cgId || cgMap[currentMarket.id]);
             }
-            
+
             function updateChartHeader() {
                 const isPositive = currentMarket.change >= 0;
                 const color = isPositive ? 'text-green-500' : 'text-red-500';
                 const sign = isPositive ? '+' : '';
-                
                 currentMarketDisplay.textContent = currentMarket.id;
-                currentPriceDisplay.textContent = `$${currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}`;
-                currentChangeDisplay.textContent = `${sign}${currentMarket.change.toFixed(2)}%`;
-                orderbookPrice.textContent = `$${currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}`;
-                
+                currentPriceDisplay.textContent = `$${Number(currentMarket.price).toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}`;
+                currentChangeDisplay.textContent = `${sign}${Number(currentMarket.change).toFixed(2)}%`;
+                orderbookPrice.textContent = `$${Number(currentMarket.price).toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}`;
                 currentPriceDisplay.className = `text-2xl font-medium ${color}`;
                 currentChangeDisplay.className = `text-sm ${color}`;
                 orderbookPrice.className = `py-2 px-2 text-lg font-bold ${color} text-center border-y border-slate-700`;
+                // update price input if market order not selected
+                if (!isMarketOrder) {
+                    priceInput.value = currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2);
+                }
             }
 
+            // --- Chart: fetch market_chart from CoinGecko for 1 day and render -->
+            async function fetchAndUpdateChart(cgId) {
+                try {
+                    const url = `https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=usd&days=1&interval=hourly`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('CoinGecko chart fetch failed');
+                    const data = await res.json();
+                    // data.prices is [[timestamp, price], ...]
+                    const points = data.prices || [];
+                    priceChartData.labels = points.map(p => {
+                        const d = new Date(p[0]);
+                        return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                    });
+                    priceChartData.data = points.map(p => p[1]);
+                    renderChart(priceChartData.labels, priceChartData.data);
+                } catch (err) {
+                    console.warn('fetchAndUpdateChart failed:', err);
+                }
+            }
+
+            function renderChart(labels, data) {
+                const ctx = document.getElementById('price-chart').getContext('2d');
+                if (priceChart) {
+                    // update dataset
+                    priceChart.data.labels = labels;
+                    priceChart.data.datasets[0].data = data;
+                    priceChart.update();
+                    return;
+                }
+                priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `${currentMarket.id} (24h)`,
+                            data: data,
+                            fill: true,
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            tension: 0.25,
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: { display: false },
+                            y: {
+                                ticks: {
+                                    callback: function(val) {
+                                        return '$' + Number(val).toFixed(0);
+                                    }
+                                }
+                            }
+                        },
+                        elements: { line: { borderColor: '#10b981' } } // don't hardcode too many colors
+                    }
+                });
+            }
+
+            // --- Order book & trades (simulated but tied to current market price) ---
             function generateOrderBookEntry(isBid) {
-                const price = currentMarket.price * (1 + (Math.random() - (isBid ? 0.51 : 0.49)) * 0.01);
+                const spreadFactor = (Math.random()*0.002) + (isBid ? -0.001 : 0.001);
+                const price = currentMarket.price * (1 + spreadFactor * (Math.random()));
                 const amount = (Math.random() * 5).toFixed(4);
                 const total = (price * amount).toFixed(2);
-                
                 const priceColor = isBid ? 'text-green-500' : 'text-red-500';
-                
                 const row = document.createElement('tr');
                 row.className = 'relative';
-                
-                // Background visualizer
                 const bgPercent = Math.min(100, (amount / 5) * 100);
                 const bgClass = isBid ? 'bg-green-900/50' : 'bg-red-900/50';
-                
                 row.innerHTML = `
-                    <td class="p-1.5 ${priceColor}">${price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}</td>
+                    <td class="p-1.5 ${priceColor}">${Number(price).toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}</td>
                     <td class="p-1.5 text-right text-slate-200">${amount}</td>
                     <td class="p-1.5 text-right text-slate-400">${total}</td>
                     <td class="absolute top-0 bottom-0 ${isBid ? 'right-0' : 'left-0'} ${bgClass}" style="width: ${bgPercent}%; z-index: -1;"></td>
@@ -535,55 +703,61 @@
             }
 
             function updateOrderBook() {
-                // Asks (Sells)
                 orderbookAsksEl.innerHTML = '';
-                for (let i = 0; i < 10; i++) {
-                    orderbookAsksEl.appendChild(generateOrderBookEntry(false));
-                }
-                
-                // Bids (Buys)
+                for (let i = 0; i < 10; i++) orderbookAsksEl.appendChild(generateOrderBookEntry(false));
                 orderbookBidsEl.innerHTML = '';
-                for (let i = 0; i < 10; i++) {
-                    orderbookBidsEl.appendChild(generateOrderBookEntry(true));
-                }
+                for (let i = 0; i < 10; i++) orderbookBidsEl.appendChild(generateOrderBookEntry(true));
             }
-            
+
             function addTradeHistory() {
                 const isBuy = Math.random() > 0.5;
                 const price = currentMarket.price * (1 + (Math.random() - 0.5) * 0.002);
                 const amount = (Math.random() * 1).toFixed(4);
                 const time = new Date().toLocaleTimeString();
-                
+                prependTrade({ price: price, amount: amount, time: time, isBuy: isBuy });
+            }
+
+            function prependTrade({price, amount, time, isBuy}) {
                 const priceColor = isBuy ? 'text-green-500' : 'text-red-500';
-                
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="p-1.5 ${priceColor}">${price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}</td>
+                    <td class="p-1.5 ${priceColor}">${Number(price).toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}</td>
                     <td class="p-1.5 text-right text-slate-200">${amount}</td>
                     <td class="p-1.5 text-right text-slate-400">${time}</td>
                 `;
-                
                 tradeHistoryEl.prepend(row);
-                
-                // Keep history to 20 entries
-                if (tradeHistoryEl.children.length > 20) {
-                    tradeHistoryEl.removeChild(tradeHistoryEl.lastChild);
-                }
+                if (tradeHistoryEl.children.length > 20) tradeHistoryEl.removeChild(tradeHistoryEl.lastChild);
             }
 
-            // --- Initial Load ---
+            // --- Initial Load & intervals ---
             updateMarketList();
             updateOrderBook();
-            for(let i=0; i<15; i++) addTradeHistory();
-            
-            // --- Intervals for Live Data ---
-            setInterval(updateMarketList, 3000); // Update markets every 3 seconds
-            setInterval(updateOrderBook, 2500); // Update order book every 2.5 seconds
-            setInterval(addTradeHistory, 2000); // Add new trade every 2 seconds
+            for (let i=0;i<12;i++) addTradeHistory();
+
+            // set the selected market properly (ensures cgId is present)
+            currentMarket = markets[0];
+            updateChartHeader();
+            // first fetch
+            fetchMarketPrices().then(() => {
+                // fetch chart for selected market after prices loaded
+                fetchAndUpdateChart(currentMarket.cgId || cgMap[currentMarket.id]);
+            });
+
+            // Intervals
+            setInterval(fetchMarketPrices, 5000); // prices every 5s (CoinGecko has rate limits; choose responsibly)
+            setInterval(updateOrderBook, 3000);
+            setInterval(addTradeHistory, 2500);
+
+            // Also refresh chart every 60s
+            setInterval(() => {
+                fetchAndUpdateChart(currentMarket.cgId || cgMap[currentMarket.id]);
+            }, 60000);
+
+            // ensure order type initially set
+            setOrderType(true);
+            setOrderMode(true);
         });
     </script>
 
 </body>
 </html>
-
-
