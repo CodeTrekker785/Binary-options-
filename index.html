@@ -1,35 +1,800 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Binary Options | Crypto Mining</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CryptoX - Decentralized Trading</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        .form-input { background-color: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 0.375rem; padding: 0.5rem 0.75rem; width: 100%; font-size: 0.875rem; }
+        .form-input:focus { outline: 2px solid #2563eb; outline-offset: 2px; border-color: #2563eb; }
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Binary Options</h1>
-    <p>Earn Bitcoin & Ethereum through our smart mining platform.</p>
+<body class="flex flex-col min-h-screen">
 
-    <div class="card">
-      <h2>BTC Mining Plan</h2>
-      <p>Start with 1 BTC → Earn 0.0125 BTC/hr</p>
-      <button onclick="startMining('BTC')">Start BTC Mining</button>
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <!-- Logo -->
+            <div class="flex-shrink-0 flex items-center">
+                <svg class="h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22" />
+                </svg>
+                <span id="brand-name" class="ml-2 text-xl font-bold text-white">CryptoX</span>
+            </div>
+
+            <!-- Right area: user & wallet -->
+            <div class="flex items-center space-x-4">
+                <div id="user-area" class="hidden items-center space-x-4">
+                    <div class="text-right">
+                        <div id="welcome" class="text-sm text-slate-300"></div>
+                        <div id="user-balance" class="text-sm font-semibold text-emerald-400"></div>
+                    </div>
+                    <button id="logout-btn" class="text-sm text-slate-300 hover:text-white px-3 py-2 rounded">Logout</button>
+                </div>
+
+                <button id="open-auth-btn" class="text-sm text-slate-300 hover:text-white hidden">Account</button>
+                <button id="connect-wallet-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-md">
+                    Connect Wallet
+                </button>
+                <button id="mobile-menu-toggle" class="md:hidden ml-3 p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-3 space-y-1">
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">Markets</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-blue-500 bg-slate-800 transition-colors">Trade</a>
+        </div>
+    </header>
+
+    <!-- Main Single-file SPA -->
+    <main class="flex-grow container mx-auto p-4 sm:px-6 lg:px-8">
+        <!-- AUTH PAGE (login/signup) -->
+        <section id="auth-page" class="page">
+            <div class="max-w-4xl mx-auto grid grid-cols-12 gap-8">
+                <div class="col-span-12 lg:col-span-6 flex flex-col justify-center">
+                    <h1 class="text-3xl font-bold">Welcome to <span class="text-blue-400">CryptoX</span></h1>
+                    <p class="mt-3 text-slate-400">Live prices powered by CoinGecko. Create an account to start with a demo USD balance and simulated trades.</p>
+                    <div class="mt-6 flex space-x-3">
+                        <button id="show-login" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white">Login</button>
+                        <button id="show-signup" class="px-4 py-2 border border-slate-700 rounded text-slate-300 hover:text-white">Create account</button>
+                    </div>
+                </div>
+
+                <div class="col-span-12 lg:col-span-6">
+                    <!-- Login -->
+                    <div id="login-card" class="bg-slate-800/60 border border-slate-700 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold mb-4">Login</h2>
+                        <form id="loginForm" class="space-y-3">
+                            <input id="loginEmail" type="email" placeholder="Email" class="form-input" required>
+                            <input id="loginPassword" type="password" placeholder="Password" class="form-input" required>
+                            <div class="flex items-center justify-between">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login</button>
+                                <a id="to-signup" class="text-sm text-slate-400 hover:underline cursor-pointer">Don't have an account?</a>
+                            </div>
+                            <div id="login-msg" class="text-sm text-rose-400"></div>
+                        </form>
+                    </div>
+
+                    <!-- Signup -->
+                    <div id="signup-card" class="bg-slate-800/60 border border-slate-700 rounded-lg p-6 mt-4 hidden">
+                        <h2 class="text-xl font-semibold mb-4">Create Account</h2>
+                        <form id="signupForm" class="space-y-3">
+                            <input id="signupUsername" type="text" placeholder="Username" class="form-input" required>
+                            <input id="signupEmail" type="email" placeholder="Email" class="form-input" required>
+                            <input id="signupPassword" type="password" placeholder="Password" class="form-input" required>
+                            <input id="signupConfirm" type="password" placeholder="Confirm password" class="form-input" required>
+                            <div class="flex items-center justify-between">
+                                <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white">Sign up</button>
+                                <a id="to-login" class="text-sm text-slate-400 hover:underline cursor-pointer">Have an account?</a>
+                            </div>
+                            <div id="signup-msg" class="text-sm text-emerald-300"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD PAGE -->
+        <section id="dashboard-page" class="page">
+            <div class="grid grid-cols-12 gap-4">
+                <!-- Left Sidebar: Markets -->
+                <aside class="col-span-12 lg:col-span-3 bg-slate-800/50 border border-slate-800 rounded-lg overflow-hidden flex flex-col">
+                    <h2 class="text-lg font-semibold text-white p-4 border-b border-slate-700">Markets</h2>
+                    <div class="p-4">
+                        <input id="market-search" type="text" placeholder="Search markets..." class="form-input">
+                    </div>
+                    <div class="flex-grow overflow-y-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="sticky top-0 bg-slate-800">
+                                <tr>
+                                    <th class="p-3 font-medium text-slate-400">Market</th>
+                                    <th class="p-3 font-medium text-slate-400 text-right">Price</th>
+                                    <th class="p-3 font-medium text-slate-400 text-right">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="market-list"></tbody>
+                        </table>
+                    </div>
+                </aside>
+
+                <!-- Center: Chart & Order Form -->
+                <div class="col-span-12 lg:col-span-6 flex flex-col gap-4">
+                    <!-- Chart -->
+                    <section class="bg-slate-800/50 border border-slate-800 rounded-lg h-64 md:h-96 flex flex-col">
+                        <div class="p-4 border-b border-slate-700 flex items-center justify-between">
+                            <div>
+                                <h2 id="current-market-display" class="text-xl font-bold text-white">BTC/USD</h2>
+                                <p id="current-market-sub" class="text-sm text-slate-400">Bitcoin / US Dollar</p>
+                            </div>
+                            <div class="text-right">
+                                <div id="current-price-display" class="text-2xl font-medium text-green-500">$--</div>
+                                <div id="current-change-display" class="text-sm text-green-500">--</div>
+                            </div>
+                        </div>
+                        <div class="flex-grow p-4">
+                            <canvas id="price-chart" class="w-full h-full"></canvas>
+                        </div>
+                    </section>
+
+                    <!-- Order Form -->
+                    <section class="bg-slate-800/50 border border-slate-800 rounded-lg">
+                        <div class="flex border-b border-slate-700">
+                            <button id="buy-tab" class="flex-1 p-4 font-semibold text-lg text-green-500 border-b-2 border-green-500">Buy</button>
+                            <button id="sell-tab" class="flex-1 p-4 font-semibold text-lg text-slate-500">Sell</button>
+                        </div>
+                        <form id="order-form" class="p-4 space-y-4">
+                            <div class="grid grid-cols-2 gap-2 bg-slate-800 p-1 rounded-lg">
+                                <button type="button" id="market-order-btn" class="order-type-btn bg-slate-700 text-white py-2 rounded-md text-sm font-medium">Market</button>
+                                <button type="button" id="limit-order-btn" class="order-type-btn text-slate-400 py-2 rounded-md text-sm font-medium">Limit</button>
+                            </div>
+
+                            <div id="price-input-group" class="hidden">
+                                <label for="price" class="block text-sm font-medium text-slate-300 mb-1">Price (USD)</label>
+                                <input id="price" name="price" step="any" type="number" class="form-input" placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label for="amount" class="block text-sm font-medium text-slate-300 mb-1">Amount (<span id="base-symbol">BTC</span>)</label>
+                                <input id="amount" name="amount" step="any" type="number" class="form-input" placeholder="0.0000">
+                            </div>
+
+                            <div>
+                                <label for="total" class="block text-sm font-medium text-slate-300 mb-1">Total (USD)</label>
+                                <input id="total" name="total" step="any" type="number" class="form-input" placeholder="0.00">
+                            </div>
+
+                            <button type="submit" id="submit-order-btn" class="w-full bg-green-600 hover:bg-green-700 text-white text-base font-semibold py-3 rounded-lg transition-colors">
+                                Buy BTC
+                            </button>
+                        </form>
+                    </section>
+                </div>
+
+                <!-- Right Sidebar: Order Book & Trades -->
+                <aside class="col-span-12 lg:col-span-3 bg-slate-800/50 border border-slate-800 rounded-lg overflow-hidden flex flex-col">
+                    <div class="flex border-b border-slate-700">
+                        <button id="orderbook-tab" class="flex-1 p-3 font-medium text-sm text-white border-b-2 border-blue-500">Order Book</button>
+                        <button id="trades-tab" class="flex-1 p-3 font-medium text-sm text-slate-500">Recent Trades</button>
+                    </div>
+
+                    <div class="flex-grow overflow-y-auto">
+                        <div id="orderbook-content">
+                            <table class="w-full text-left text-xs">
+                                <thead class="sticky top-0 bg-slate-800">
+                                    <tr>
+                                        <th class="p-2 font-medium text-slate-400">Price (USD)</th>
+                                        <th class="p-2 font-medium text-slate-400 text-right">Amount</th>
+                                        <th class="p-2 font-medium text-slate-400 text-right">Total (USD)</th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                            <table class="w-full text-left text-xs"><tbody id="orderbook-asks"></tbody></table>
+
+                            <div id="orderbook-price" class="py-2 px-2 text-lg font-bold text-slate-300 text-center border-y border-slate-700">$--</div>
+
+                            <table class="w-full text-left text-xs"><tbody id="orderbook-bids"></tbody></table>
+                        </div>
+
+                        <div id="trades-content" class="hidden">
+                            <table class="w-full text-left text-xs">
+                                <thead class="sticky top-0 bg-slate-800">
+                                    <tr>
+                                        <th class="p-2 font-medium text-slate-400">Price (USD)</th>
+                                        <th class="p-2 font-medium text-slate-400 text-right">Amount</th>
+                                        <th class="p-2 font-medium text-slate-400 text-right">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trade-history"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 mt-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center text-sm">
+            <p class="text-slate-400">&copy; 2025 CryptoX. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a class="text-slate-400 hover:text-white">About</a>
+                <a class="text-slate-400 hover:text-white">Support</a>
+                <a class="text-slate-400 hover:text-white">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Connect Wallet Modal -->
+    <div id="wallet-modal" class="fixed inset-0 bg-black/70 z-40 flex items-center justify-center hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="bg-slate-800 w-full max-w-md m-4 rounded-lg shadow-xl border border-slate-700">
+            <div class="flex items-center justify-between p-4 border-b border-slate-700">
+                <h3 class="text-lg font-semibold text-white" id="modal-title">Connect Wallet</h3>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-slate-400">Choose your wallet provider to connect.</p>
+                <button id="connect-metamask" class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <img src="https://placehold.co/40x40/334155/e2e8f0?text=M" alt="MetaMask" class="h-10 w-10 rounded-full mr-4">
+                    <span class="text-base font-medium text-white">MetaMask</span>
+                </button>
+                <button id="walletconnect-doc" class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <img src="https://placehold.co/40x40/334155/e2e8f0?text=W" alt="WalletConnect" class="h-10 w-10 rounded-full mr-4">
+                    <span class="text-base font-medium text-white">WalletConnect (Docs)</span>
+                </button>
+                <div id="wallet-info" class="mt-2 text-sm text-slate-300"></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-      <h2>ETH Mining Plan</h2>
-      <p>Start with $1000 → Earn $300/hr</p>
-      <button onclick="startMining('ETH')">Start ETH Mining</button>
-    </div>
+<script>
+/* CryptoX single-file SPA
+   - Users in localStorage
+   - Starting balance: $100,000 USD per new user
+   - Holds per-user USD balance & crypto holdings
+   - CoinGecko for prices & chart
+   - Chart.js for 24h chart
+   - MetaMask connect + restore
+*/
 
-    <p class="note">Payouts every hour | Fully automated</p>
-  </div>
+document.addEventListener('DOMContentLoaded', () => {
+  // ----------- Config & state -------------
+  const STARTING_USD = 100000; // user starting balance
+  const cgMap = { 'BTC/USD':'bitcoin', 'ETH/USD':'ethereum', 'SOL/USD':'solana', 'DOGE/USD':'dogecoin', 'LINK/USD':'chainlink' };
 
-  <script>
-    function startMining(coin) {
-      alert(`${coin} Mining started! Please wait for your rewards.`);
+  let markets = [
+    { id:'BTC/USD', price:0, change:0, cgId:'bitcoin' },
+    { id:'ETH/USD', price:0, change:0, cgId:'ethereum' },
+    { id:'SOL/USD', price:0, change:0, cgId:'solana' },
+    { id:'DOGE/USD', price:0, change:0, cgId:'dogecoin' },
+    { id:'LINK/USD', price:0, change:0, cgId:'chainlink' }
+  ];
+
+  let currentMarket = JSON.parse(localStorage.getItem('cryptox_selectedMarket')) || markets[0];
+  let isBuyMode = true;
+  let isMarketOrder = true;
+  let priceChart = null;
+
+  // ----------- DOM references -------------
+  const pages = { auth: document.getElementById('auth-page'), dashboard: document.getElementById('dashboard-page') };
+  const loginCard = document.getElementById('login-card'), signupCard = document.getElementById('signup-card');
+  const showLoginBtn = document.getElementById('show-login'), showSignupBtn = document.getElementById('show-signup');
+  const toSignup = document.getElementById('to-signup'), toLogin = document.getElementById('to-login');
+
+  const loginForm = document.getElementById('loginForm'), signupForm = document.getElementById('signupForm');
+  const loginMsg = document.getElementById('login-msg'), signupMsg = document.getElementById('signup-msg');
+
+  const userArea = document.getElementById('user-area'), welcomeEl = document.getElementById('welcome'), logoutBtn = document.getElementById('logout-btn');
+  const userBalanceEl = document.getElementById('user-balance');
+
+  const connectWalletBtn = document.getElementById('connect-wallet-btn');
+  const walletModal = document.getElementById('wallet-modal');
+  const connectMetaMaskBtn = document.getElementById('connect-metamask');
+  const walletInfoEl = document.getElementById('wallet-info');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+  const walletConnectDoc = document.getElementById('walletconnect-doc');
+
+  const marketListEl = document.getElementById('market-list'), marketSearchInput = document.getElementById('market-search');
+  const currentMarketDisplay = document.getElementById('current-market-display'), currentPriceDisplay = document.getElementById('current-price-display'), currentChangeDisplay = document.getElementById('current-change-display'), orderbookPrice = document.getElementById('orderbook-price');
+  const priceChartEl = document.getElementById('price-chart');
+
+  const buyTab = document.getElementById('buy-tab'), sellTab = document.getElementById('sell-tab');
+  const marketOrderBtn = document.getElementById('market-order-btn'), limitOrderBtn = document.getElementById('limit-order-btn');
+  const priceInputGroup = document.getElementById('price-input-group');
+  const priceInput = document.getElementById('price'), amountInput = document.getElementById('amount'), totalInput = document.getElementById('total');
+  const submitOrderBtn = document.getElementById('submit-order-btn'), orderForm = document.getElementById('order-form');
+  const baseSymbolEl = document.getElementById('base-symbol');
+
+  const orderbookAsksEl = document.getElementById('orderbook-asks'), orderbookBidsEl = document.getElementById('orderbook-bids');
+  const tradeHistoryEl = document.getElementById('trade-history');
+  const orderbookTab = document.getElementById('orderbook-tab'), tradesTab = document.getElementById('trades-tab');
+  const orderbookContent = document.getElementById('orderbook-content'), tradesContent = document.getElementById('trades-content');
+
+  const mobileToggle = document.getElementById('mobile-menu-toggle'), mobileMenu = document.getElementById('mobile-menu');
+
+  // ------------- Storage helpers --------------
+  function usersKey(){ return 'cryptox_users'; }
+  function getUsers(){ try { return JSON.parse(localStorage.getItem(usersKey())) || {}; } catch(e){ return {}; } }
+  function saveUsers(u){ localStorage.setItem(usersKey(), JSON.stringify(u)); }
+  function saveUser(user){ const users = getUsers(); users[user.email] = user; saveUsers(users); }
+  function getLoggedIn(){ return localStorage.getItem('cryptox_loggedInUser'); }
+  function setLoggedIn(email){ localStorage.setItem('cryptox_loggedInUser', email); }
+  function logoutUser(){ localStorage.removeItem('cryptox_loggedInUser'); updateAuthUI(); showPage('auth'); }
+
+  function getCurrentUserObj(){
+    const email = getLoggedIn();
+    if (!email) return null;
+    const users = getUsers();
+    return users[email] || null;
+  }
+  function persistCurrentUser(u){
+    if (!u || !u.email) return;
+    const users = getUsers(); users[u.email] = u; saveUsers(users);
+  }
+
+  // -------------- Auth UI ----------------
+  function updateAuthUI(){
+    const email = getLoggedIn();
+    if (email){
+      const u = getCurrentUserObj();
+      userArea.classList.remove('hidden');
+      welcomeEl.textContent = `Hi, ${u.username}`;
+      updateBalanceUI(u);
+      document.getElementById('open-auth-btn').classList.add('hidden');
+    } else {
+      userArea.classList.add('hidden');
+      welcomeEl.textContent = '';
+      userBalanceEl.textContent = '';
+      document.getElementById('open-auth-btn').classList.remove('hidden');
     }
-  </script>
+  }
+
+  function updateBalanceUI(user){
+    if (!user) { userBalanceEl.textContent = ''; return; }
+    // Show USD balance and a compact holdings summary
+    const usd = Number(user.balanceUsd||0);
+    const holdings = user.holdings || {};
+    const holdingSummary = Object.keys(holdings).map(sym => {
+      const v = Number(holdings[sym]);
+      if (v === 0) return null;
+      return `${v} ${sym}`;
+    }).filter(Boolean).slice(0,3).join(' • ');
+    userBalanceEl.textContent = `$${usd.toLocaleString(undefined, {maximumFractionDigits:2})}${holdingSummary? ' • ' + holdingSummary : ''}`;
+  }
+
+  // --------------- Page navigation ----------------
+  function showPage(name){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = pages[name];
+    if (el) el.classList.add('active');
+  }
+
+  // -------------- Auth events ----------------
+  showLoginBtn.addEventListener('click', ()=> { loginCard.classList.remove('hidden'); signupCard.classList.add('hidden'); });
+  showSignupBtn.addEventListener('click', ()=> { signupCard.classList.remove('hidden'); loginCard.classList.add('hidden'); });
+  toSignup.addEventListener('click', ()=> { signupCard.classList.remove('hidden'); loginCard.classList.add('hidden'); });
+  toLogin.addEventListener('click', ()=> { loginCard.classList.remove('hidden'); signupCard.classList.add('hidden'); });
+
+  // Signup: create user with starting USD and empty holdings
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    signupMsg.textContent = '';
+    const username = document.getElementById('signupUsername').value.trim();
+    const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    if (!username || !email || !password) { signupMsg.textContent = 'All fields required'; return; }
+    if (password !== confirm) { signupMsg.textContent = 'Passwords do not match'; return; }
+    const users = getUsers();
+    if (users[email]) { signupMsg.textContent = 'Account already exists'; return; }
+    // create user
+    const user = {
+      username,
+      email,
+      password, // demo only; DO NOT store plaintext in production
+      balanceUsd: STARTING_USD,
+      holdings: {}, // e.g. { BTC: 0.5 }
+      trades: [] // per-user trade history
+    };
+    saveUser(user);
+    signupMsg.textContent = 'Account created — logging in...';
+    setTimeout(()=>{
+      setLoggedIn(email);
+      updateAuthUI();
+      showPage('dashboard');
+      initDashboardAfterLogin();
+    }, 600);
+  });
+
+  // Login
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    loginMsg.textContent = '';
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    const users = getUsers();
+    const u = users[email];
+    if (!u){ loginMsg.textContent = 'User not found'; return; }
+    if (u.password !== password){ loginMsg.textContent = 'Incorrect password'; return; }
+    // success
+    setLoggedIn(email);
+    updateAuthUI();
+    showPage('dashboard');
+    initDashboardAfterLogin();
+  });
+
+  // Auto-login at load
+  function initAtLoad(){
+    const logged = getLoggedIn();
+    if (logged){
+      updateAuthUI();
+      showPage('dashboard');
+      initDashboardAfterLogin();
+    } else {
+      // show auth
+      showPage('auth');
+      loginCard.classList.remove('hidden'); signupCard.classList.add('hidden');
+    }
+  }
+
+  logoutBtn.addEventListener('click', ()=> { logoutUser(); });
+
+  // -------------- Wallet (MetaMask) --------------
+  function shortAddress(addr){ return addr ? addr.slice(0,6) + '...' + addr.slice(-4) : ''; }
+  function weiHexToEth(hex){ try { const wei=BigInt(hex); const eth=Number(wei)/1e18; return (Math.round((eth+Number.EPSILON)*1e6)/1e6).toString(); } catch(e){ return '0'; } }
+
+  // restore wallet display if saved
+  const savedWallet = localStorage.getItem('cryptox_connectedWallet');
+  if (savedWallet){
+    connectWalletBtn.textContent = shortAddress(savedWallet);
+    walletInfoEl.innerHTML = `<div><strong class="text-white">${shortAddress(savedWallet)}</strong><div class="text-slate-400">Wallet restored</div></div>`;
+  }
+
+  async function connectMetaMask(){
+    if (!window.ethereum){
+      walletInfoEl.innerHTML = `<div class="text-sm text-yellow-300">MetaMask not detected. Install: <a class="underline" href="https://metamask.io/" target="_blank">metamask.io</a></div>`;
+      return;
+    }
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+      const balanceHex = await window.ethereum.request({ method: 'eth_getBalance', params: [account,'latest'] });
+      const ethBalance = weiHexToEth(balanceHex);
+      walletInfoEl.innerHTML = `<div><strong class="text-white">${shortAddress(account)}</strong><div class="text-slate-400">Balance: ${ethBalance} ETH</div></div>`;
+      connectWalletBtn.textContent = shortAddress(account);
+      localStorage.setItem('cryptox_connectedWallet', account);
+      setTimeout(()=> walletModal.classList.add('hidden'), 700);
+    } catch (err){
+      console.error(err);
+      walletInfoEl.innerHTML = `<div class="text-rose-400">Connection failed</div>`;
+    }
+  }
+
+  connectMetaMaskBtn.addEventListener('click', connectMetaMask);
+  connectWalletBtn.addEventListener('click', ()=> walletModal.classList.remove('hidden'));
+  closeModalBtn.addEventListener('click', ()=> walletModal.classList.add('hidden'));
+  walletConnectDoc.addEventListener('click', ()=> window.open('https://docs.walletconnect.com/','_blank'));
+
+  // -------------- Market prices (CoinGecko) --------------
+  async function fetchMarketPrices(){
+    try {
+      const ids = Object.values(cgMap).join(',');
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('CoinGecko error');
+      const data = await res.json();
+      markets = markets.map(m => {
+        const id = m.cgId || cgMap[m.id];
+        if (data[id] && data[id].usd !== undefined){
+          return {...m, price: data[id].usd, change: data[id].usd_24h_change || 0};
+        }
+        return m;
+      });
+      // keep reference to a selected market
+      const sel = markets.find(m => m.id === currentMarket.id);
+      if (sel) currentMarket = sel;
+      updateMarketList();
+      updateChartHeader();
+    } catch (err){
+      console.warn('fetchMarketPrices failed', err);
+    }
+  }
+
+  function updateMarketList(){
+    const filter = (marketSearchInput.value||'').toLowerCase();
+    marketListEl.innerHTML = '';
+    markets.forEach(m => {
+      if (filter && !m.id.toLowerCase().includes(filter)) return;
+      const isPositive = (m.change || 0) >= 0;
+      const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
+      const sign = isPositive ? '+' : '';
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-700/50 cursor-pointer border-b border-slate-700/50';
+      tr.innerHTML = `<td class="p-3 font-medium text-white">${m.id}</td><td class="p-3 text-right ${changeColor}">${Number(m.price).toFixed(m.id==='DOGE/USD'?4:2)}</td><td class="p-3 text-right ${changeColor}">${sign}${Number(m.change||0).toFixed(2)}%</td>`;
+      tr.addEventListener('click', ()=> selectMarket(m));
+      marketListEl.appendChild(tr);
+    });
+  }
+
+  function selectMarket(m){
+    currentMarket = m;
+    localStorage.setItem('cryptox_selectedMarket', JSON.stringify(currentMarket));
+    updateChartHeader();
+    fetchAndUpdateChart(currentMarket.cgId || cgMap[currentMarket.id]);
+  }
+
+  function updateChartHeader(){
+    const isPositive = (currentMarket.change||0) >= 0;
+    const color = isPositive ? 'text-green-500' : 'text-red-500';
+    const sign = isPositive ? '+' : '';
+    currentMarketDisplay.textContent = currentMarket.id;
+    currentPriceDisplay.textContent = `$${Number(currentMarket.price||0).toFixed(currentMarket.id==='DOGE/USD'?4:2)}`;
+    currentChangeDisplay.textContent = `${sign}${Number(currentMarket.change||0).toFixed(2)}%`;
+    orderbookPrice.textContent = `$${Number(currentMarket.price||0).toFixed(currentMarket.id==='DOGE/USD'?4:2)}`;
+    currentPriceDisplay.className = `text-2xl font-medium ${color}`;
+    currentChangeDisplay.className = `text-sm ${color}`;
+    orderbookPrice.className = `py-2 px-2 text-lg font-bold ${color} text-center border-y border-slate-700`;
+    baseSymbolEl.textContent = currentMarket.id.split('/')[0];
+    if (!isMarketOrder) priceInput.value = Number(currentMarket.price||0).toFixed(currentMarket.id==='DOGE/USD'?4:2);
+  }
+
+  // ---------- Chart: CoinGecko market_chart 24h ----------
+  async function fetchAndUpdateChart(cgId){
+    try {
+      const url = `https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=usd&days=1&interval=hourly`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('chart fetch failed');
+      const data = await res.json();
+      const points = data.prices || [];
+      const labels = points.map(p => new Date(p[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+      const values = points.map(p => p[1]);
+      renderChart(labels, values);
+    } catch (err){
+      console.warn('fetchAndUpdateChart', err);
+    }
+  }
+
+  function renderChart(labels, data){
+    const ctx = priceChartEl.getContext('2d');
+    if (priceChart){
+      priceChart.data.labels = labels;
+      priceChart.data.datasets[0].data = data;
+      priceChart.update();
+      return;
+    }
+    priceChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label: `${currentMarket.id} (24h)`, data, fill:true, borderWidth:1, pointRadius:0, tension:0.25 }] },
+      options: {
+        maintainAspectRatio:false,
+        plugins: { legend:{ display:false }},
+        scales: { x:{ display:false }, y:{ ticks:{ callback: v => '$' + Number(v).toFixed(0) }}},
+        elements: { line: { borderColor:'#10b981' } }
+      }
+    });
+  }
+
+  // -------------- Orderbook & trades (simulated, tied to currentMarket.price) -------------
+  function generateOrderBookEntry(isBid){
+    const spreadFactor = (Math.random()*0.002) + (isBid ? -0.001 : 0.001);
+    const price = (currentMarket.price||0) * (1 + spreadFactor * Math.random());
+    const amount = (Math.random()*5).toFixed(4);
+    const total = (price * amount).toFixed(2);
+    const priceColor = isBid ? 'text-green-500' : 'text-red-500';
+    const row = document.createElement('tr');
+    row.className = 'relative';
+    const bgPercent = Math.min(100, (amount/5)*100);
+    const bgClass = isBid ? 'bg-green-900/50' : 'bg-red-900/50';
+    row.innerHTML = `<td class="p-1.5 ${priceColor}">${Number(price).toFixed(currentMarket.id==='DOGE/USD'?4:2)}</td><td class="p-1.5 text-right text-slate-200">${amount}</td><td class="p-1.5 text-right text-slate-400">${total}</td><td class="absolute top-0 bottom-0 ${isBid? 'right-0' : 'left-0'} ${bgClass}" style="width:${bgPercent}%; z-index:-1;"></td>`;
+    return row;
+  }
+
+  function updateOrderBook(){
+    orderbookAsksEl.innerHTML=''; orderbookBidsEl.innerHTML='';
+    for (let i=0;i<10;i++) orderbookAsksEl.appendChild(generateOrderBookEntry(false));
+    for (let i=0;i<10;i++) orderbookBidsEl.appendChild(generateOrderBookEntry(true));
+  }
+
+  function prependTrade({price, amount, time, isBuy, symbol}){
+    const priceColor = isBuy ? 'text-green-500' : 'text-red-500';
+    const row = document.createElement('tr');
+    row.innerHTML = `<td class="p-1.5 ${priceColor}">${Number(price).toFixed(currentMarket.id==='DOGE/USD'?4:2)}</td><td class="p-1.5 text-right text-slate-200">${amount} ${symbol||currentMarket.id.split('/')[0]}</td><td class="p-1.5 text-right text-slate-400">${time}</td>`;
+    tradeHistoryEl.prepend(row);
+    if (tradeHistoryEl.children.length > 60) tradeHistoryEl.removeChild(tradeHistoryEl.lastChild);
+  }
+
+  function addTradeHistory(){
+    const isBuy = Math.random()>0.5;
+    const price = (currentMarket.price||0) * (1 + (Math.random()-0.5)*0.002);
+    const amount = (Math.random()*1).toFixed(4);
+    const time = new Date().toLocaleTimeString();
+    prependTrade({price, amount, time, isBuy, symbol: currentMarket.id.split('/')[0]});
+  }
+
+  // --------------- Orders: buy/sell logic (updates user balance + holdings) ----------
+  buyTab.addEventListener('click', ()=> setOrderMode(true));
+  sellTab.addEventListener('click', ()=> setOrderMode(false));
+  marketOrderBtn.addEventListener('click', ()=> setOrderType(true));
+  limitOrderBtn.addEventListener('click', ()=> setOrderType(false));
+
+  function setOrderMode(isBuy){
+    isBuyMode = isBuy;
+    if (isBuy){
+      buyTab.classList.add('text-green-500','border-green-500'); buyTab.classList.remove('text-slate-500');
+      sellTab.classList.add('text-slate-500'); sellTab.classList.remove('text-red-500','border-red-500');
+      submitOrderBtn.classList.add('bg-green-600'); submitOrderBtn.classList.remove('bg-red-600');
+      submitOrderBtn.textContent = `Buy ${currentMarket.id.split('/')[0]}`;
+    } else {
+      sellTab.classList.add('text-red-500','border-red-500'); sellTab.classList.remove('text-slate-500');
+      buyTab.classList.add('text-slate-500'); buyTab.classList.remove('text-green-500','border-green-500');
+      submitOrderBtn.classList.add('bg-red-600'); submitOrderBtn.classList.remove('bg-green-600');
+      submitOrderBtn.textContent = `Sell ${currentMarket.id.split('/')[0]}`;
+    }
+  }
+
+  function setOrderType(isMarket){
+    isMarketOrder = isMarket;
+    if (isMarket){
+      marketOrderBtn.classList.add('bg-slate-700','text-white'); marketOrderBtn.classList.remove('text-slate-400');
+      limitOrderBtn.classList.add('text-slate-400'); limitOrderBtn.classList.remove('bg-slate-700','text-white');
+      priceInputGroup.classList.add('hidden');
+      priceInput.value = Number(currentMarket.price||0).toFixed(currentMarket.id==='DOGE/USD'?4:2);
+    } else {
+      limitOrderBtn.classList.add('bg-slate-700','text-white'); limitOrderBtn.classList.remove('text-slate-400');
+      marketOrderBtn.classList.add('text-slate-400'); marketOrderBtn.classList.remove('bg-slate-700','text-white');
+      priceInputGroup.classList.remove('hidden');
+      priceInput.value = Number(currentMarket.price||0).toFixed(currentMarket.id==='DOGE/USD'?4:2);
+    }
+  }
+
+  amountInput.addEventListener('input', syncTotalFromAmount);
+  totalInput.addEventListener('input', syncAmountFromTotal);
+
+  function syncTotalFromAmount(){
+    const amt = parseFloat(amountInput.value||0);
+    const p = isMarketOrder ? (currentMarket.price||0) : parseFloat(priceInput.value||currentMarket.price||0);
+    if (amt && p) totalInput.value = (amt * p).toFixed(6).replace(/\.?0+$/,"");
+    else totalInput.value = '';
+  }
+  function syncAmountFromTotal(){
+    const total = parseFloat(totalInput.value||0);
+    const p = isMarketOrder ? (currentMarket.price||0) : parseFloat(priceInput.value||currentMarket.price||0);
+    if (total && p) amountInput.value = (total / p).toFixed(6).replace(/\.?0+$/,"");
+    else amountInput.value = '';
+  }
+
+  orderForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const amt = parseFloat(amountInput.value);
+    const price = isMarketOrder ? (currentMarket.price||0) : parseFloat(priceInput.value);
+    if (!amt || amt <= 0) { console.error('Amount must be > 0'); return; }
+    if (!price || price <= 0) { console.error('Price must be > 0'); return; }
+
+    const symbol = currentMarket.id.split('/')[0];
+    const total = Number((amt * price).toFixed(8));
+
+    const user = getCurrentUserObj();
+    if (!user){ alert('Please login'); return; }
+
+    if (isBuyMode){
+      // Buying -> need enough USD
+      if (user.balanceUsd < total){ alert('Insufficient USD balance'); return; }
+      user.balanceUsd = Number((user.balanceUsd - total).toFixed(8));
+      user.holdings[symbol] = Number(((user.holdings[symbol]||0) + amt).toFixed(8));
+      // record trade
+      const trade = { type:'buy', symbol, amount: amt, price, total, time: new Date().toLocaleTimeString() };
+      user.trades = user.trades || [];
+      user.trades.unshift(trade);
+      persistCurrentUser(user);
+      prependTrade({ price, amount: amt, time: trade.time, isBuy:true, symbol });
+      updateBalanceUI(user);
+      submitOrderBtn.textContent = 'Order Placed!';
+      setTimeout(()=> submitOrderBtn.textContent = `Buy ${symbol}`, 1600);
+    } else {
+      // Selling -> need holdings
+      const holding = Number(user.holdings[symbol]||0);
+      if (holding < amt){ alert(`Insufficient ${symbol} holdings`); return; }
+      user.holdings[symbol] = Number((holding - amt).toFixed(8));
+      user.balanceUsd = Number((user.balanceUsd + total).toFixed(8));
+      const trade = { type:'sell', symbol, amount: amt, price, total, time: new Date().toLocaleTimeString() };
+      user.trades = user.trades || [];
+      user.trades.unshift(trade);
+      persistCurrentUser(user);
+      prependTrade({ price, amount: amt, time: trade.time, isBuy:false, symbol });
+      updateBalanceUI(user);
+      submitOrderBtn.textContent = 'Order Placed!';
+      setTimeout(()=> submitOrderBtn.textContent = `Sell ${symbol}`, 1600);
+    }
+
+    // reset form
+    if (isMarketOrder) orderForm.reset();
+    else { amountInput.value = ''; totalInput.value = ''; }
+    setOrderType(isMarketOrder);
+    refreshTradeHistoryFromUser();
+  });
+
+  // --------------- Trades persistence & UI --------------
+  function refreshTradeHistoryFromUser(){
+    const user = getCurrentUserObj();
+    tradeHistoryEl.innerHTML = '';
+    if (!user || !user.trades) return;
+    user.trades.slice(0,60).forEach(t => {
+      prependTrade({ price: t.price, amount: t.amount, time: t.time, isBuy: t.type === 'buy', symbol: t.symbol });
+    });
+  }
+
+  // --------------- Right sidebar tabs ----------------
+  orderbookTab.addEventListener('click', ()=> {
+    orderbookContent.classList.remove('hidden'); tradesContent.classList.add('hidden');
+    orderbookTab.classList.add('text-white','border-blue-500'); tradesTab.classList.remove('text-white','border-blue-500'); tradesTab.classList.add('text-slate-500');
+  });
+  tradesTab.addEventListener('click', ()=> {
+    tradesContent.classList.remove('hidden'); orderbookContent.classList.add('hidden');
+    tradesTab.classList.add('text-white','border-blue-500'); orderbookTab.classList.remove('text-white','border-blue-500'); orderbookTab.classList.add('text-slate-500');
+  });
+
+  // --------------- Dashboard init ----------------
+  function initDashboardAfterLogin(){
+    updateAuthUI();
+    // restore selected market if stored
+    const stored = JSON.parse(localStorage.getItem('cryptox_selectedMarket'));
+    if (stored){
+      const found = markets.find(m => m.id === stored.id);
+      if (found) currentMarket = found;
+    }
+    updateChartHeader();
+    fetchMarketPrices().then(()=> {
+      fetchAndUpdateChart(currentMarket.cgId || cgMap[currentMarket.id]);
+    });
+    // intervals
+    setInterval(fetchMarketPrices, 10000);
+    setInterval(updateOrderBook, 3000);
+    setInterval(addTradeHistory, 2500);
+    setInterval(()=> fetchAndUpdateChart(currentMarket.cgId || cgMap[currentMarket.id]), 60000);
+
+    setOrderType(true);
+    setOrderMode(true);
+    updateMarketList();
+    updateOrderBook();
+    refreshTradeHistoryFromUser();
+    // seed some simulated trades so panel is not empty if user has none
+    if (tradeHistoryEl.children.length === 0) for (let i=0;i<6;i++) addTradeHistory();
+  }
+
+  // --------------- Start app ---------------
+  initAtLoad();
+
+  // mobile toggle
+  mobileToggle.addEventListener('click', ()=> mobileMenu.classList.toggle('hidden'));
+
+  // market search
+  marketSearchInput.addEventListener('input', updateMarketList);
+
+});
+</script>
 </body>
 </html>
