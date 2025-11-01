@@ -1,35 +1,589 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Binary Options | Crypto Mining</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Trade - Decentralized Trading</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom scrollbar for dark mode */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; /* slate-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; /* slate-600 */
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+
+        /* Use Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+        }
+
+        /* Custom class for form inputs */
+        .form-input {
+            background-color: #1e293b; /* slate-800 */
+            border: 1px solid #334155; /* slate-700 */
+            color: #e2e8f0; /* slate-200 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.5rem 0.75rem; /* py-2 px-3 */
+            width: 100%;
+            font-size: 0.875rem; /* text-sm */
+        }
+        .form-input:focus {
+            outline: 2px solid #2563eb; /* blue-600 */
+            outline-offset: 2px;
+            border-color: #2563eb;
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Binary Options</h1>
-    <p>Earn Bitcoin & Ethereum through our smart mining platform.</p>
+<body class="flex flex-col min-h-screen">
 
-    <div class="card">
-      <h2>BTC Mining Plan</h2>
-      <p>Start with 1 BTC → Earn 0.0125 BTC/hr</p>
-      <button onclick="startMining('BTC')">Start BTC Mining</button>
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <!-- Logo -->
+            <div class="flex-shrink-0 flex items-center">
+                <svg class="h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.22m5.94 2.22h-5.94m5.94 2.22v5.94M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                <span class="ml-2 text-xl font-bold text-white">GeminiTrade</span>
+            </div>
+            
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Markets</a>
+                <a href="#" class="text-sm font-medium text-blue-500 hover:text-blue-400 transition-colors">Trade</a>
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Portfolio</a>
+                <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Docs</a>
+            </div>
+            
+            <!-- Connect Button & Mobile Menu Toggle -->
+            <div class="flex items-center">
+                <button id="connect-wallet-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors shadow-md">
+                    Connect Wallet
+                </button>
+                <button id="mobile-menu-toggle" class="md:hidden ml-3 p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-3 space-y-1">
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">Markets</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-blue-500 bg-slate-800 transition-colors">Trade</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">Portfolio</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">Docs</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 sm:px-6 lg:px-8 grid grid-cols-12 gap-4">
+
+        <!-- Left Sidebar: Markets -->
+        <aside class="col-span-12 lg:col-span-3 bg-slate-800/50 border border-slate-800 rounded-lg overflow-hidden flex flex-col">
+            <h2 class="text-lg font-semibold text-white p-4 border-b border-slate-700">Markets</h2>
+            <div class="p-4">
+                <input type="text" placeholder="Search markets..." class="form-input">
+            </div>
+            <div class="flex-grow overflow-y-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="sticky top-0 bg-slate-800">
+                        <tr>
+                            <th class="p-3 font-medium text-slate-400">Market</th>
+                            <th class="p-3 font-medium text-slate-400 text-right">Price</th>
+                            <th class="p-3 font-medium text-slate-400 text-right">Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="market-list">
+                        <!-- Market data will be injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </aside>
+
+        <!-- Center: Chart & Order Form -->
+        <div class="col-span-12 lg:col-span-6 flex flex-col gap-4">
+            
+            <!-- Chart -->
+            <section class="bg-slate-800/50 border border-slate-800 rounded-lg h-64 md:h-96 flex flex-col">
+                <!-- Chart Header -->
+                <div class="p-4 border-b border-slate-700 flex items-center justify-between">
+                    <div>
+                        <h2 id="current-market-display" class="text-xl font-bold text-white">BTC/USD</h2>
+                        <p class="text-sm text-slate-400">Bitcoin / US Dollar</p>
+                    </div>
+                    <div class="text-right">
+                        <div id="current-price-display" class="text-2xl font-medium text-green-500">$68,420.50</div>
+                        <div id="current-change-display" class="text-sm text-green-500">+2.35%</div>
+                    </div>
+                </div>
+                <!-- Chart Placeholder -->
+                <div class="flex-grow flex items-center justify-center">
+                    <p class="text-slate-500">Trading chart would load here.</p>
+                </div>
+            </section>
+            
+            <!-- Order Form -->
+            <section class="bg-slate-800/50 border border-slate-800 rounded-lg">
+                <!-- Tabs: Buy/Sell -->
+                <div class="flex border-b border-slate-700">
+                    <button id="buy-tab" class="flex-1 p-4 font-semibold text-lg text-green-500 border-b-2 border-green-500">
+                        Buy
+                    </button>
+                    <button id="sell-tab" class="flex-1 p-4 font-semibold text-lg text-slate-500">
+                        Sell
+                    </button>
+                </div>
+                
+                <form id="order-form" class="p-4 space-y-4">
+                    <!-- Order Type: Market/Limit -->
+                    <div class="grid grid-cols-2 gap-2 bg-slate-800 p-1 rounded-lg">
+                        <button type="button" id="market-order-btn" class="order-type-btn bg-slate-700 text-white py-2 rounded-md text-sm font-medium">Market</button>
+                        <button type="button" id="limit-order-btn" class="order-type-btn text-slate-400 py-2 rounded-md text-sm font-medium">Limit</button>
+                    </div>
+                    
+                    <!-- Price (Limit Only) -->
+                    <div id="price-input-group" class="hidden">
+                        <label for="price" class="block text-sm font-medium text-slate-300 mb-1">Price (USD)</label>
+                        <input type="number" id="price" name="price" class="form-input" placeholder="0.00">
+                    </div>
+                    
+                    <!-- Amount -->
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-slate-300 mb-1">Amount (BTC)</label>
+                        <input type="number" id="amount" name="amount" class="form-input" placeholder="0.0000">
+                    </div>
+                    
+                    <!-- Total -->
+                    <div>
+                        <label for="total" class="block text-sm font-medium text-slate-300 mb-1">Total (USD)</label>
+                        <input type="number" id="total" name="total" class="form-input" placeholder="0.00">
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-order-btn" class="w-full bg-green-600 hover:bg-green-700 text-white text-base font-semibold py-3 rounded-lg transition-colors">
+                        Buy BTC
+                    </button>
+                </form>
+            </section>
+        </div>
+
+        <!-- Right Sidebar: Order Book & Trades -->
+        <aside class="col-span-12 lg:col-span-3 bg-slate-800/50 border border-slate-800 rounded-lg overflow-hidden flex flex-col">
+            <!-- Tabs: Order Book / Trades -->
+            <div class="flex border-b border-slate-700">
+                <button id="orderbook-tab" class="flex-1 p-3 font-medium text-sm text-white border-b-2 border-blue-500">Order Book</button>
+                <button id="trades-tab" class="flex-1 p-3 font-medium text-sm text-slate-500">Recent Trades</button>
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-grow overflow-y-auto">
+                
+                <!-- Order Book -->
+                <div id="orderbook-content">
+                    <table class="w-full text-left text-xs">
+                        <thead class="sticky top-0 bg-slate-800">
+                            <tr>
+                                <th class="p-2 font-medium text-slate-400">Price (USD)</th>
+                                <th class="p-2 font-medium text-slate-400 text-right">Amount (BTC)</th>
+                                <th class="p-2 font-medium text-slate-400 text-right">Total (USD)</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    
+                    <!-- Asks (Sells) -->
+                    <table class="w-full text-left text-xs">
+                        <tbody id="orderbook-asks">
+                            <!-- Asks data will be injected by JS -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- Current Price Display -->
+                    <div class="py-2 px-2 text-lg font-bold text-slate-300 text-center border-y border-slate-700" id="orderbook-price">
+                        $68,420.50
+                    </div>
+
+                    <!-- Bids (Buys) -->
+                    <table class="w-full text-left text-xs">
+                        <tbody id="orderbook-bids">
+                            <!-- Bids data will be injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Recent Trades -->
+                <div id="trades-content" class="hidden">
+                    <table class="w-full text-left text-xs">
+                        <thead class="sticky top-0 bg-slate-800">
+                            <tr>
+                                <th class="p-2 font-medium text-slate-400">Price (USD)</th>
+                                <th class="p-2 font-medium text-slate-400 text-right">Amount (BTC)</th>
+                                <th class="p-2 font-medium text-slate-400 text-right">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trade-history">
+                            <!-- Trades data will be injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 mt-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-center text-sm">
+            <p class="text-slate-400">&copy; 2025 Gemini Trade. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="text-slate-400 hover:text-white">About</a>
+                <a href="#" class="text-slate-400 hover:text-white">Support</a>
+                <a href="#" class="text-slate-400 hover:text-white">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Connect Wallet Modal -->
+    <div id="wallet-modal" class_name="wallet-modal" class="fixed inset-0 bg-black/70 z-40 flex items-center justify-center hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="bg-slate-800 w-full max-w-md m-4 rounded-lg shadow-xl border border-slate-700">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 border-b border-slate-700">
+                <h3 class="text-lg font-semibold text-white" id="modal-title">Connect Wallet</h3>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-white">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-slate-400">Choose your wallet provider to connect.</p>
+                <button class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <img src="https://placehold.co/40x40/334155/e2e8f0?text=M" alt="MetaMask" class="h-10 w-10 rounded-full mr-4">
+                    <span class="text-base font-medium text-white">MetaMask</span>
+                </button>
+                <button class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <img src="https://placehold.co/40x40/334155/e2e8f0?text=W" alt="WalletConnect" class="h-10 w-10 rounded-full mr-4">
+                    <span class="text-base font-medium text-white">WalletConnect</span>
+                </button>
+                <button class="w-full flex items-center p-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <img src="https://placehold.co/40x40/334155/e2e8f0?text=C" alt="Coinbase" class="h-10 w-10 rounded-full mr-4">
+                    <span class="text-base font-medium text-white">Coinbase Wallet</span>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-      <h2>ETH Mining Plan</h2>
-      <p>Start with $1000 → Earn $300/hr</p>
-      <button onclick="startMining('ETH')">Start ETH Mining</button>
-    </div>
 
-    <p class="note">Payouts every hour | Fully automated</p>
-  </div>
+    <!-- Inline JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- State ---
+            let isBuyMode = true;
+            let isMarketOrder = true;
+            let currentMarket = { id: 'BTC/USD', price: 68420.50, change: 2.35 };
+            const markets = [
+                { id: 'BTC/USD', price: 68420.50, change: 2.35 },
+                { id: 'ETH/USD', price: 3450.12, change: 1.78 },
+                { id: 'SOL/USD', price: 172.45, change: -0.52 },
+                { id: 'DOGE/USD', price: 0.165, change: 5.12 },
+                { id: 'LINK/USD', price: 18.30, change: -1.10 },
+            ];
+            
+            // --- Selectors ---
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const connectWalletBtn = document.getElementById('connect-wallet-btn');
+            const walletModal = document.getElementById('wallet-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            
+            const buyTab = document.getElementById('buy-tab');
+            const sellTab = document.getElementById('sell-tab');
+            const marketOrderBtn = document.getElementById('market-order-btn');
+            const limitOrderBtn = document.getElementById('limit-order-btn');
+            const priceInputGroup = document.getElementById('price-input-group');
+            const submitOrderBtn = document.getElementById('submit-order-btn');
+            const orderForm = document.getElementById('order-form');
 
-  <script>
-    function startMining(coin) {
-      alert(`${coin} Mining started! Please wait for your rewards.`);
-    }
-  </script>
+            const orderbookTab = document.getElementById('orderbook-tab');
+            const tradesTab = document.getElementById('trades-tab');
+            const orderbookContent = document.getElementById('orderbook-content');
+            const tradesContent = document.getElementById('trades-content');
+            
+            const marketListEl = document.getElementById('market-list');
+            const orderbookBidsEl = document.getElementById('orderbook-bids');
+            const orderbookAsksEl = document.getElementById('orderbook-asks');
+            const tradeHistoryEl = document.getElementById('trade-history');
+            
+            const currentMarketDisplay = document.getElementById('current-market-display');
+            const currentPriceDisplay = document.getElementById('current-price-display');
+            const currentChangeDisplay = document.getElementById('current-change-display');
+            const orderbookPrice = document.getElementById('orderbook-price');
+
+            // --- Event Listeners ---
+            
+            // Mobile Menu
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Wallet Modal
+            connectWalletBtn.addEventListener('click', () => {
+                walletModal.classList.remove('hidden');
+            });
+            closeModalBtn.addEventListener('click', () => {
+                walletModal.classList.add('hidden');
+            });
+            walletModal.addEventListener('click', (e) => {
+                if (e.target === walletModal) {
+                    walletModal.classList.add('hidden');
+                }
+            });
+            
+            // Order Form Tabs (Buy/Sell)
+            buyTab.addEventListener('click', () => {
+                setOrderMode(true);
+            });
+            sellTab.addEventListener('click', () => {
+                setOrderMode(false);
+            });
+            
+            // Order Form Type (Market/Limit)
+            marketOrderBtn.addEventListener('click', () => {
+                setOrderType(true);
+            });
+            limitOrderBtn.addEventListener('click', () => {
+                setOrderType(false);
+            });
+            
+            // Order Form Submission
+            orderForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const amount = e.target.elements.amount.value;
+                const price = e.target.elements.price.value;
+                const type = isMarketOrder ? 'Market' : 'Limit';
+                const side = isBuyMode ? 'Buy' : 'Sell';
+                
+                // Simple validation
+                if (!amount || amount <= 0) {
+                    // In a real app, show a proper message, not alert
+                    console.error("Amount must be greater than 0");
+                    return;
+                }
+                if (!isMarketOrder && (!price || price <= 0)) {
+                    console.error("Price must be greater than 0 for limit orders");
+                    return;
+                }
+                
+                // Show a confirmation message (not an alert)
+                submitOrderBtn.textContent = 'Order Placed!';
+                setTimeout(() => {
+                    submitOrderBtn.textContent = `${isBuyMode ? 'Buy' : 'Sell'} ${currentMarket.id.split('/')[0]}`;
+                }, 2000);
+                
+                orderForm.reset();
+                setOrderType(isMarketOrder); // Reset form state
+            });
+            
+            // Right Sidebar Tabs
+            orderbookTab.addEventListener('click', () => {
+                orderbookContent.classList.remove('hidden');
+                tradesContent.classList.add('hidden');
+                orderbookTab.classList.add('text-white', 'border-blue-500');
+                orderbookTab.classList.remove('text-slate-500');
+                tradesTab.classList.add('text-slate-500');
+                tradesTab.classList.remove('text-white', 'border-blue-500');
+            });
+            tradesTab.addEventListener('click', () => {
+                tradesContent.classList.remove('hidden');
+                orderbookContent.classList.add('hidden');
+                tradesTab.classList.add('text-white', 'border-blue-500');
+                tradesTab.classList.remove('text-slate-500');
+                orderbookTab.classList.add('text-slate-500');
+                orderbookTab.classList.remove('text-white', 'border-blue-500');
+            });
+
+            // --- Functions ---
+            
+            function setOrderMode(isBuy) {
+                isBuyMode = isBuy;
+                if (isBuy) {
+                    buyTab.classList.add('text-green-500', 'border-green-500');
+                    buyTab.classList.remove('text-slate-500');
+                    sellTab.classList.add('text-slate-500');
+                    sellTab.classList.remove('text-red-500', 'border-red-500');
+                    submitOrderBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    submitOrderBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    submitOrderBtn.textContent = `Buy ${currentMarket.id.split('/')[0]}`;
+                } else {
+                    sellTab.classList.add('text-red-500', 'border-red-500');
+                    sellTab.classList.remove('text-slate-500');
+                    buyTab.classList.add('text-slate-500');
+                    buyTab.classList.remove('text-green-500', 'border-green-500');
+                    submitOrderBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                    submitOrderBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    submitOrderBtn.textContent = `Sell ${currentMarket.id.split('/')[0]}`;
+                }
+            }
+            
+            function setOrderType(isMarket) {
+                isMarketOrder = isMarket;
+                if (isMarket) {
+                    marketOrderBtn.classList.add('bg-slate-700', 'text-white');
+                    marketOrderBtn.classList.remove('text-slate-400');
+                    limitOrderBtn.classList.add('text-slate-400');
+                    limitOrderBtn.classList.remove('bg-slate-700', 'text-white');
+                    priceInputGroup.classList.add('hidden');
+                } else {
+                    limitOrderBtn.classList.add('bg-slate-700', 'text-white');
+                    limitOrderBtn.classList.remove('text-slate-400');
+                    marketOrderBtn.classList.add('text-slate-400');
+                    marketOrderBtn.classList.remove('bg-slate-700', 'text-white');
+                    priceInputGroup.classList.remove('hidden');
+                }
+            }
+
+            function updateMarketList() {
+                marketListEl.innerHTML = ''; // Clear list
+                markets.forEach(market => {
+                    // Simulate price fluctuation
+                    market.price *= (1 + (Math.random() - 0.495) * 0.005);
+                    market.change += (Math.random() - 0.5) * 0.1;
+                    
+                    const isPositive = market.change >= 0;
+                    const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
+                    const sign = isPositive ? '+' : '';
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-slate-700/50 cursor-pointer border-b border-slate-700/50';
+                    row.innerHTML = `
+                        <td class="p-3 font-medium text-white">${market.id}</td>
+                        <td class="p-3 text-right ${changeColor}">${market.price.toFixed(market.id === 'DOGE/USD' ? 4 : 2)}</td>
+                        <td class="p-3 text-right ${changeColor}">${sign}${market.change.toFixed(2)}%</td>
+                    `;
+                    row.addEventListener('click', () => selectMarket(market));
+                    marketListEl.appendChild(row);
+                    
+                    if (market.id === currentMarket.id) {
+                        currentMarket = market;
+                        updateChartHeader();
+                    }
+                });
+            }
+            
+            function selectMarket(market) {
+                currentMarket = market;
+                updateChartHeader();
+                setOrderMode(isBuyMode); // Update buy/sell button text
+            }
+            
+            function updateChartHeader() {
+                const isPositive = currentMarket.change >= 0;
+                const color = isPositive ? 'text-green-500' : 'text-red-500';
+                const sign = isPositive ? '+' : '';
+                
+                currentMarketDisplay.textContent = currentMarket.id;
+                currentPriceDisplay.textContent = `$${currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}`;
+                currentChangeDisplay.textContent = `${sign}${currentMarket.change.toFixed(2)}%`;
+                orderbookPrice.textContent = `$${currentMarket.price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}`;
+                
+                currentPriceDisplay.className = `text-2xl font-medium ${color}`;
+                currentChangeDisplay.className = `text-sm ${color}`;
+                orderbookPrice.className = `py-2 px-2 text-lg font-bold ${color} text-center border-y border-slate-700`;
+            }
+
+            function generateOrderBookEntry(isBid) {
+                const price = currentMarket.price * (1 + (Math.random() - (isBid ? 0.51 : 0.49)) * 0.01);
+                const amount = (Math.random() * 5).toFixed(4);
+                const total = (price * amount).toFixed(2);
+                
+                const priceColor = isBid ? 'text-green-500' : 'text-red-500';
+                
+                const row = document.createElement('tr');
+                row.className = 'relative';
+                
+                // Background visualizer
+                const bgPercent = Math.min(100, (amount / 5) * 100);
+                const bgClass = isBid ? 'bg-green-900/50' : 'bg-red-900/50';
+                
+                row.innerHTML = `
+                    <td class="p-1.5 ${priceColor}">${price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}</td>
+                    <td class="p-1.5 text-right text-slate-200">${amount}</td>
+                    <td class="p-1.5 text-right text-slate-400">${total}</td>
+                    <td class="absolute top-0 bottom-0 ${isBid ? 'right-0' : 'left-0'} ${bgClass}" style="width: ${bgPercent}%; z-index: -1;"></td>
+                `;
+                return row;
+            }
+
+            function updateOrderBook() {
+                // Asks (Sells)
+                orderbookAsksEl.innerHTML = '';
+                for (let i = 0; i < 10; i++) {
+                    orderbookAsksEl.appendChild(generateOrderBookEntry(false));
+                }
+                
+                // Bids (Buys)
+                orderbookBidsEl.innerHTML = '';
+                for (let i = 0; i < 10; i++) {
+                    orderbookBidsEl.appendChild(generateOrderBookEntry(true));
+                }
+            }
+            
+            function addTradeHistory() {
+                const isBuy = Math.random() > 0.5;
+                const price = currentMarket.price * (1 + (Math.random() - 0.5) * 0.002);
+                const amount = (Math.random() * 1).toFixed(4);
+                const time = new Date().toLocaleTimeString();
+                
+                const priceColor = isBuy ? 'text-green-500' : 'text-red-500';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-1.5 ${priceColor}">${price.toFixed(currentMarket.id === 'DOGE/USD' ? 4 : 2)}</td>
+                    <td class="p-1.5 text-right text-slate-200">${amount}</td>
+                    <td class="p-1.5 text-right text-slate-400">${time}</td>
+                `;
+                
+                tradeHistoryEl.prepend(row);
+                
+                // Keep history to 20 entries
+                if (tradeHistoryEl.children.length > 20) {
+                    tradeHistoryEl.removeChild(tradeHistoryEl.lastChild);
+                }
+            }
+
+            // --- Initial Load ---
+            updateMarketList();
+            updateOrderBook();
+            for(let i=0; i<15; i++) addTradeHistory();
+            
+            // --- Intervals for Live Data ---
+            setInterval(updateMarketList, 3000); // Update markets every 3 seconds
+            setInterval(updateOrderBook, 2500); // Update order book every 2.5 seconds
+            setInterval(addTradeHistory, 2000); // Add new trade every 2 seconds
+        });
+    </script>
+
 </body>
 </html>
+
+
