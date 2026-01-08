@@ -3,84 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smooth Transition Demo</title>
+    <title>Crypto Transfer Demo 2026</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root { --accent: #fcd535; --bg: #0b0e11; --card: #1e2329; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
         
-        body { background: #0f172a; color: white; overflow-x: hidden; }
-
-        section {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        button { 
+            background: var(--card); border: 1px solid #474d57; color: white; 
+            padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s;
         }
+        button:hover, button.active { border-color: var(--accent); background: #2b3139; }
 
-        /* The Reveal Transition Class */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
+        .flow-card { 
+            background: var(--card); padding: 30px; border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 300px;
+            transition: opacity 0.4s ease;
         }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Hover Transitions */
-        .card {
-            background: #1e293b;
-            padding: 2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid #334155;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-            background: #334155;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        h1 { font-size: 3rem; margin-bottom: 1rem; }
-        p { color: #94a3b8; max-width: 600px; }
+        .step { margin-bottom: 20px; padding-left: 20px; border-left: 2px solid var(--accent); }
+        .warning { background: #4b1113; padding: 10px; border-radius: 5px; font-size: 0.9rem; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <section>
-        <h1 class="reveal">Welcome to the Demo</h1>
-        <p class="reveal">Scroll down to see the transitions in action.</p>
-    </section>
+<div class="container">
+    <h1 style="text-align: center; margin-bottom: 10px;">Transfer Demo</h1>
+    <p style="text-align: center; color: #848e9c; margin-bottom: 40px;">Select a transfer route to see the technical flow.</p>
 
-    <section style="background: #1e293b;">
-        <div class="card reveal">
-            <h2>Smooth Hover</h2>
-            <p>I gently scale and glow when you touch me.</p>
+    <div class="platform-grid">
+        <button onclick="updateFlow('binance')">PayPal → Binance</button>
+        <button onclick="updateFlow('bybit')">PayPal → Bybit</button>
+        <button onclick="updateFlow('external')">PayPal → External</button>
+    </div>
+
+    <div id="flow-content" class="flow-card">
+        <div id="steps-container">
+            <h3>Select a route above to begin</h3>
+            <p>This demo simulates the API and UI transitions for 2026 cross-platform transfers.</p>
         </div>
-    </section>
+    </div>
+</div>
 
-    <section>
-        <h1 class="reveal">The End</h1>
-        <p class="reveal">Simple, clean, and effective.</p>
-    </section>
+<script>
+    const flows = {
+        binance: {
+            title: "PayPal to Binance (P2P Method)",
+            steps: [
+                "Open Binance P2P Marketplace and select 'Buy USDT'.",
+                "Filter payment methods by 'PayPal'.",
+                "Initiate trade; Binance Escrow locks the seller's crypto.",
+                "Send Fiat via PayPal to the seller's email.",
+                "Click 'Transferred' on Binance to release funds."
+            ],
+            warning: "Note: Ensure your Binance KYC name matches your PayPal account name exactly."
+        },
+        bybit: {
+            title: "PayPal to Bybit (One-Click/P2P)",
+            steps: [
+                "Go to Bybit 'One-Click Buy' or P2P.",
+                "Select 'PayPal' as the third-party provider.",
+                "Authorized redirect to PayPal login.",
+                "Confirm the transaction amount in PayPal.",
+                "Redirect back to Bybit for asset confirmation."
+            ],
+            warning: "Fees: Third-party providers often charge 2-4% for this convenience."
+        },
+        external: {
+            title: "Direct Crypto Withdrawal (US Only)",
+            steps: [
+                "Buy PYUSD or BTC directly in the PayPal app.",
+                "Select 'Transfer' -> 'Send' to external wallet.",
+                "Paste your Binance/Bybit Wallet Address.",
+                "Select the correct Network (e.g., ERC-20 or Solana).",
+                "Verify via 2FA to complete the blockchain move."
+            ],
+            warning: "Risk: Sending via the wrong network (e.g., BTC to ETH address) will result in permanent loss."
+        }
+    };
 
-    <script>
-        // Intersection Observer to trigger "active" class on scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    </script>
+    function updateFlow(route) {
+        const data = flows[route];
+        const container = document.getElementById('steps-container');
+        
+        let html = `<h2>${data.title}</h2><br>`;
+        data.steps.forEach((step, i) => {
+            html += `<div class="step"><strong>Step ${i+1}:</strong> ${step}</div>`;
+        });
+        html += `<div class="warning">⚠️ ${data.warning}</div>`;
+        
+        container.style.opacity = 0;
+        setTimeout(() => {
+            container.innerHTML = html;
+            container.style.opacity = 1;
+        }, 200);
+    }
+</script>
 </body>
 </html>
