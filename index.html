@@ -1,97 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Trade | Broker Portal</title>
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-    <style>
-        :root { --bg: #0b0e11; --card: #1e2329; --text: #eaecef; --buy: #0ecb81; --sell: #f6465d; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
-        
-        /* Layout Grid */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 300px 300px;
-            grid-template-rows: 60px 1fr 250px;
-            height: 100vh;
-        }
-
-        header { grid-column: span 3; background: var(--card); border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
-        #chart-container { grid-row: 2; position: relative; border-right: 1px solid #333; }
-        .order-book { grid-row: 2; background: var(--card); border-right: 1px solid #333; padding: 10px; font-size: 12px; }
-        .trade-panel { grid-row: 2 / span 2; background: var(--card); padding: 20px; }
-        .history { grid-column: span 2; background: var(--bg); border-top: 1px solid #333; padding: 15px; }
-
-        /* Components */
-        .price-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .buy-btn { background: var(--buy); border: none; color: white; width: 100%; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        .sell-btn { background: var(--sell); border: none; color: white; width: 100%; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        input { background: #2b3139; border: 1px solid #474d57; color: white; padding: 10px; width: 80%; border-radius: 4px; margin-bottom: 15px; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>NexGen Brokerage | Trade Smart</title>
 </head>
-<body>
+<body class="bg-slate-900 text-white font-sans">
 
-<div class="dashboard">
-    <header>
-        <div style="font-weight: bold; color: #fcd535;">NEXUS BROKER</div>
-        <div id="live-price">BTC/USDT: $64,231.50</div>
-        <div>Balance: 12,450.00 USDT</div>
+    <nav class="p-6 flex justify-between items-center border-b border-slate-800">
+        <div class="text-2xl font-bold text-blue-500">NEXGEN</div>
+        <div class="space-x-6">
+            <a href="#" class="hover:text-blue-400">Markets</a>
+            <a href="#" class="hover:text-blue-400">Education</a>
+            <button class="bg-blue-600 px-6 py-2 rounded-lg font-semibold">Login</button>
+        </div>
+    </nav>
+
+    <header class="py-20 text-center">
+        <h1 class="text-6xl font-extrabold mb-6">Trade the World <span class="text-blue-500">Markets</span></h1>
+        <p class="text-slate-400 text-xl mb-8 max-w-2xl mx-auto">
+            Low spreads, instant execution, and professional tools for the modern trader.
+        </p>
+        <button class="bg-white text-slate-900 px-10 py-4 rounded-full text-lg font-bold hover:bg-blue-500 hover:text-white transition">
+            Start Trading Now
+        </button>
     </header>
 
-    <div id="chart-container"></div>
+    <section class="bg-slate-800 p-4 flex justify-around">
+        <div>BTC: <span class="text-green-400">$98,420.00 (+2.4%)</span></div>
+        <div>AAPL: <span class="text-red-400">$192.15 (-0.8%)</span></div>
+        <div>EUR/USD: <span class="text-green-400">1.0845 (+0.1%)</span></div>
+    </section>
 
-    <div class="order-book">
-        <h4 style="margin-bottom: 10px;">Order Book</h4>
-        <div id="asks" style="color: var(--sell);"></div>
-        <div style="font-size: 18px; margin: 10px 0; text-align: center;">64,231.50</div>
-        <div id="bids" style="color: var(--buy);"></div>
-    </div>
-
-    <div class="trade-panel">
-        <h4>Spot Trading</h4>
-        <p style="font-size: 12px; color: #848e9c;">Price</p>
-        <input type="text" value="64231.50">
-        <p style="font-size: 12px; color: #848e9c;">Amount (BTC)</p>
-        <input type="number" placeholder="0.00">
-        <button class="buy-btn">Buy BTC</button>
-        <button class="sell-btn">Sell BTC</button>
-    </div>
-
-    <div class="history">
-        <h4>Open Orders (0)</h4>
-        <p style="color: #848e9c; font-size: 14px; text-align: center; margin-top: 50px;">No active orders found.</p>
-    </div>
-</div>
-
-<script>
-    // 1. Initialize Financial Chart
-    const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
-        layout: { backgroundColor: '#0b0e11', textColor: '#d1d4dc' },
-        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
-        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    });
-    const lineSeries = chart.addLineSeries({ color: '#fcd535' });
-    
-    // Mock Data Loop
-    let currentPrice = 64231;
-    setInterval(() => {
-        currentPrice += (Math.random() - 0.5) * 20;
-        lineSeries.update({ time: Math.floor(Date.now() / 1000), value: currentPrice });
-        document.getElementById('live-price').innerText = `BTC/USDT: $${currentPrice.toFixed(2)}`;
-    }, 1000);
-
-    // 2. Mock Order Book
-    function updateOrderBook() {
-        const bids = document.getElementById('bids');
-        const asks = document.getElementById('asks');
-        bids.innerHTML = asks.innerHTML = '';
-        for(let i=0; i<8; i++) {
-            asks.innerHTML += `<div class="price-row"><span>${(currentPrice + i*2).toFixed(1)}</span><span>${(Math.random()*2).toFixed(3)}</span></div>`;
-            bids.innerHTML += `<div class="price-row"><span>${(currentPrice - i*2).toFixed(1)}</span><span>${(Math.random()*2).toFixed(3)}</span></div>`;
-        }
-    }
-    setInterval(updateOrderBook, 2000);
-</script>
 </body>
 </html>
