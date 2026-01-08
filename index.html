@@ -3,101 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Transfer Demo 2026</title>
+    <title>Nexus Trade | Broker Portal</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        :root { --accent: #fcd535; --bg: #0b0e11; --card: #1e2329; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        :root { --bg: #0b0e11; --card: #1e2329; --text: #eaecef; --buy: #0ecb81; --sell: #f6465d; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
         
-        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
-        button { 
-            background: var(--card); border: 1px solid #474d57; color: white; 
-            padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+        /* Layout Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 300px 300px;
+            grid-template-rows: 60px 1fr 250px;
+            height: 100vh;
         }
-        button:hover, button.active { border-color: var(--accent); background: #2b3139; }
 
-        .flow-card { 
-            background: var(--card); padding: 30px; border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 300px;
-            transition: opacity 0.4s ease;
-        }
-        .step { margin-bottom: 20px; padding-left: 20px; border-left: 2px solid var(--accent); }
-        .warning { background: #4b1113; padding: 10px; border-radius: 5px; font-size: 0.9rem; margin-top: 20px; }
+        header { grid-column: span 3; background: var(--card); border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
+        #chart-container { grid-row: 2; position: relative; border-right: 1px solid #333; }
+        .order-book { grid-row: 2; background: var(--card); border-right: 1px solid #333; padding: 10px; font-size: 12px; }
+        .trade-panel { grid-row: 2 / span 2; background: var(--card); padding: 20px; }
+        .history { grid-column: span 2; background: var(--bg); border-top: 1px solid #333; padding: 15px; }
+
+        /* Components */
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .buy-btn { background: var(--buy); border: none; color: white; width: 100%; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .sell-btn { background: var(--sell); border: none; color: white; width: 100%; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        input { background: #2b3139; border: 1px solid #474d57; color: white; padding: 10px; width: 80%; border-radius: 4px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1 style="text-align: center; margin-bottom: 10px;">Transfer Demo</h1>
-    <p style="text-align: center; color: #848e9c; margin-bottom: 40px;">Select a transfer route to see the technical flow.</p>
+<div class="dashboard">
+    <header>
+        <div style="font-weight: bold; color: #fcd535;">NEXUS BROKER</div>
+        <div id="live-price">BTC/USDT: $64,231.50</div>
+        <div>Balance: 12,450.00 USDT</div>
+    </header>
 
-    <div class="platform-grid">
-        <button onclick="updateFlow('binance')">PayPal → Binance</button>
-        <button onclick="updateFlow('bybit')">PayPal → Bybit</button>
-        <button onclick="updateFlow('external')">PayPal → External</button>
+    <div id="chart-container"></div>
+
+    <div class="order-book">
+        <h4 style="margin-bottom: 10px;">Order Book</h4>
+        <div id="asks" style="color: var(--sell);"></div>
+        <div style="font-size: 18px; margin: 10px 0; text-align: center;">64,231.50</div>
+        <div id="bids" style="color: var(--buy);"></div>
     </div>
 
-    <div id="flow-content" class="flow-card">
-        <div id="steps-container">
-            <h3>Select a route above to begin</h3>
-            <p>This demo simulates the API and UI transitions for 2026 cross-platform transfers.</p>
-        </div>
+    <div class="trade-panel">
+        <h4>Spot Trading</h4>
+        <p style="font-size: 12px; color: #848e9c;">Price</p>
+        <input type="text" value="64231.50">
+        <p style="font-size: 12px; color: #848e9c;">Amount (BTC)</p>
+        <input type="number" placeholder="0.00">
+        <button class="buy-btn">Buy BTC</button>
+        <button class="sell-btn">Sell BTC</button>
+    </div>
+
+    <div class="history">
+        <h4>Open Orders (0)</h4>
+        <p style="color: #848e9c; font-size: 14px; text-align: center; margin-top: 50px;">No active orders found.</p>
     </div>
 </div>
 
 <script>
-    const flows = {
-        binance: {
-            title: "PayPal to Binance (P2P Method)",
-            steps: [
-                "Open Binance P2P Marketplace and select 'Buy USDT'.",
-                "Filter payment methods by 'PayPal'.",
-                "Initiate trade; Binance Escrow locks the seller's crypto.",
-                "Send Fiat via PayPal to the seller's email.",
-                "Click 'Transferred' on Binance to release funds."
-            ],
-            warning: "Note: Ensure your Binance KYC name matches your PayPal account name exactly."
-        },
-        bybit: {
-            title: "PayPal to Bybit (One-Click/P2P)",
-            steps: [
-                "Go to Bybit 'One-Click Buy' or P2P.",
-                "Select 'PayPal' as the third-party provider.",
-                "Authorized redirect to PayPal login.",
-                "Confirm the transaction amount in PayPal.",
-                "Redirect back to Bybit for asset confirmation."
-            ],
-            warning: "Fees: Third-party providers often charge 2-4% for this convenience."
-        },
-        external: {
-            title: "Direct Crypto Withdrawal (US Only)",
-            steps: [
-                "Buy PYUSD or BTC directly in the PayPal app.",
-                "Select 'Transfer' -> 'Send' to external wallet.",
-                "Paste your Binance/Bybit Wallet Address.",
-                "Select the correct Network (e.g., ERC-20 or Solana).",
-                "Verify via 2FA to complete the blockchain move."
-            ],
-            warning: "Risk: Sending via the wrong network (e.g., BTC to ETH address) will result in permanent loss."
-        }
-    };
+    // 1. Initialize Financial Chart
+    const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
+        layout: { backgroundColor: '#0b0e11', textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    });
+    const lineSeries = chart.addLineSeries({ color: '#fcd535' });
+    
+    // Mock Data Loop
+    let currentPrice = 64231;
+    setInterval(() => {
+        currentPrice += (Math.random() - 0.5) * 20;
+        lineSeries.update({ time: Math.floor(Date.now() / 1000), value: currentPrice });
+        document.getElementById('live-price').innerText = `BTC/USDT: $${currentPrice.toFixed(2)}`;
+    }, 1000);
 
-    function updateFlow(route) {
-        const data = flows[route];
-        const container = document.getElementById('steps-container');
-        
-        let html = `<h2>${data.title}</h2><br>`;
-        data.steps.forEach((step, i) => {
-            html += `<div class="step"><strong>Step ${i+1}:</strong> ${step}</div>`;
-        });
-        html += `<div class="warning">⚠️ ${data.warning}</div>`;
-        
-        container.style.opacity = 0;
-        setTimeout(() => {
-            container.innerHTML = html;
-            container.style.opacity = 1;
-        }, 200);
+    // 2. Mock Order Book
+    function updateOrderBook() {
+        const bids = document.getElementById('bids');
+        const asks = document.getElementById('asks');
+        bids.innerHTML = asks.innerHTML = '';
+        for(let i=0; i<8; i++) {
+            asks.innerHTML += `<div class="price-row"><span>${(currentPrice + i*2).toFixed(1)}</span><span>${(Math.random()*2).toFixed(3)}</span></div>`;
+            bids.innerHTML += `<div class="price-row"><span>${(currentPrice - i*2).toFixed(1)}</span><span>${(Math.random()*2).toFixed(3)}</span></div>`;
+        }
     }
+    setInterval(updateOrderBook, 2000);
 </script>
 </body>
 </html>
