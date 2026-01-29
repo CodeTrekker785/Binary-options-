@@ -1,35 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broker Italia | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>NexGen Brokerage | Trade Smart</title>
 </head>
-<body class="bg-slate-900 text-white font-sans">
+<body class="bg-gray-900 text-white font-sans">
 
-    <nav class="p-6 flex justify-between items-center border-b border-slate-800">
-        <div class="text-2xl font-bold text-blue-500">NEXGEN</div>
-        <div class="space-x-6">
-            <a href="#" class="hover:text-blue-400">Markets</a>
-            <a href="#" class="hover:text-blue-400">Education</a>
-            <button class="bg-blue-600 px-6 py-2 rounded-lg font-semibold">Login</button>
+    <nav class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-900 sticky top-0">
+        <h1 class="text-2xl font-bold text-emerald-400">ITALIAN<span class="text-white">BROKER</span></h1>
+        <div class="space-x-6 text-gray-400">
+            <a href="#" class="hover:text-white">Mercati</a>
+            <a href="#" class="hover:text-white">Portafoglio</a>
+            <button class="bg-emerald-500 text-gray-900 px-4 py-2 rounded-lg font-bold">Accedi</button>
         </div>
     </nav>
 
-    <header class="py-20 text-center">
-        <h1 class="text-6xl font-extrabold mb-6">Trade the World <span class="text-blue-500">Markets</span></h1>
-        <p class="text-slate-400 text-xl mb-8 max-w-2xl mx-auto">
-            Low spreads, instant execution, and professional tools for the modern trader.
-        </p>
-        <button class="bg-white text-slate-900 px-10 py-4 rounded-full text-lg font-bold hover:bg-blue-500 hover:text-white transition">
-            Start Trading Now
-        </button>
-    </header>
+    <main class="p-8 max-w-6xl mx-auto">
+        <div class="mb-10">
+            <h2 class="text-gray-400 uppercase text-sm tracking-widest">Saldo Totale</h2>
+            <p class="text-5xl font-mono mt-2">€ 12.450,00 <span class="text-emerald-400 text-lg">+2.4%</span></p>
+        </div>
 
-    <section class="bg-slate-800 p-4 flex justify-around">
-        <div>BTC: <span class="text-green-400">$98,420.00 (+2.4%)</span></div>
-        <div>AAPL: <span class="text-red-400">$192.15 (-0.8%)</span></div>
-        <div>EUR/USD: <span class="text-green-400">1.0845 (+0.1%)</span></div>
-    </section>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                <h3 class="text-gray-400">Azioni (Stocks)</h3>
+                <p class="text-2xl mt-2 font-bold">€ 8.200</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                <h3 class="text-gray-400">Crypto</h3>
+                <p class="text-2xl mt-2 font-bold">€ 4.250</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-2xl border border-emerald-500/50">
+                <h3 class="text-emerald-400">Nuovo Ordine</h3>
+                <p class="text-sm text-gray-500 mt-2">Compra/Vendi asset in tempo reale.</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700">
+            <table class="w-full text-left">
+                <thead class="bg-gray-700/50 text-gray-400 uppercase text-xs">
+                    <tr>
+                        <th class="p-4">Simbolo</th>
+                        <th class="p-4">Prezzo</th>
+                        <th class="p-4">Variazione</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    <tr>
+                        <td class="p-4">BTC/EUR</td>
+                        <td class="p-4 font-mono">€ 38.410,20</td>
+                        <td class="p-4 text-emerald-400">+1.2%</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4">AAPL (Apple)</td>
+                        <td class="p-4 font-mono">€ 172,45</td>
+                        <td class="p-4 text-red-400">-0.5%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
 
 </body>
 </html>
