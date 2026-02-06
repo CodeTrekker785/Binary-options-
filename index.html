@@ -25,7 +25,6 @@
             padding: 20px;
         }
 
-        /* Instruction Badge */
         .edit-hint {
             background: #222;
             color: var(--primary-green);
@@ -41,7 +40,6 @@
             max-width: 400px;
         }
 
-        /* Content Editable Focus Style */
         [contenteditable="true"]:focus {
             outline: 1px dashed var(--primary-green);
             background: rgba(0, 210, 133, 0.05);
@@ -65,8 +63,8 @@
         .summary-section { text-align: center; }
 
         .icon-circle {
-            width: 45px;
-            height: 45px;
+            width: 55px;
+            height: 55px;
             background: #1a2a24;
             border-radius: 50%;
             display: flex;
@@ -74,6 +72,14 @@
             justify-content: center;
             margin: 0 auto 15px;
             border: 1px solid #005a3a;
+            cursor: pointer;
+        }
+
+        .icon-circle img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            display: none;
         }
 
         .amount { font-size: 32px; font-weight: 700; margin: 5px 0; }
@@ -97,7 +103,14 @@
             background: var(--primary-green);
         }
 
-        .step { position: relative; font-size: 10px; width: 30%; text-align: center; line-height: 1.4; }
+        .step {
+            position: relative;
+            font-size: 10px;
+            width: 30%;
+            text-align: center;
+            line-height: 1.4;
+        }
+
         .dot {
             width: 18px;
             height: 18px;
@@ -122,9 +135,12 @@
         .label { color: var(--text-muted); }
         .value { text-align: right; font-weight: 400; }
 
-        .divider { height: 1px; background: var(--border-color); margin: 15px 0; }
+        .footer-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
 
-        .footer-btns { display: flex; gap: 10px; margin-top: 10px; }
         .btn {
             flex: 1;
             padding: 14px;
@@ -134,8 +150,17 @@
             cursor: pointer;
             font-size: 14px;
         }
-        .btn-outline { background: #1a1a1a; border: 1px solid #333; color: var(--primary-green); }
-        .btn-solid { background: var(--primary-green); color: #000; }
+
+        .btn-outline {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: var(--primary-green);
+        }
+
+        .btn-solid {
+            background: var(--primary-green);
+            color: #000;
+        }
 
         @media print {
             .edit-hint, .footer-btns { display: none; }
@@ -147,16 +172,31 @@
 
 <div class="edit-hint">✨ Tip: Click on any text to edit it</div>
 
-<div class="receipt-container" id="receipt">
+<div class="receipt-container">
+
     <div class="header">
-        <span style="font-size: 20px;">‹</span>
-        <span style="font-weight: 500;">Transaction Details</span>
-        <span style="color: var(--primary-green); font-size: 20px;">🎧</span>
+        <span style="font-size:20px;">‹</span>
+        <span style="font-weight:500;">Transaction Details</span>
+        <span style="color:var(--primary-green); font-size:20px;">🎧</span>
     </div>
 
     <div class="card summary-section">
-        <div class="icon-circle">🏦</div>
-        <div class="label">Transfer to <span contenteditable="true" style="color:white; font-weight: 500;">JOHN UNEKE OGBONNAYA</span></div>
+
+        <!-- CLICKABLE ICON -->
+        <div class="icon-circle" onclick="openGallery()">
+            <span id="bankEmoji">🏦</span>
+            <img id="bankImage" alt="Bank Logo">
+        </div>
+
+        <input type="file" id="galleryInput" accept="image/*" hidden>
+
+        <div class="label">
+            Transfer to
+            <span contenteditable="true" style="color:white; font-weight:500;">
+                JOHN UNEKE OGBONNAYA
+            </span>
+        </div>
+
         <div class="amount" contenteditable="true">₦10,000.00</div>
         <div class="status">Successful</div>
 
@@ -182,43 +222,15 @@
             <span class="label">Amount</span>
             <span class="value" contenteditable="true">₦10,000.00</span>
         </div>
+
         <div class="detail-row">
             <span class="label">Fee</span>
             <span class="value" contenteditable="true">₦0.00</span>
         </div>
+
         <div class="detail-row">
             <span class="label">Amount Paid</span>
             <span class="value" contenteditable="true">₦10,000.00</span>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="detail-row">
-            <span class="label">Recipient Details</span>
-            <span class="value">
-                <div contenteditable="true" style="font-weight: 500;">JOHN</div>
-                <div class="label" contenteditable="true">Opay | 6104165496</div>
-            </span>
-        </div>
-        <div class="detail-row">
-            <span class="label">Transaction Type</span>
-            <span class="value" contenteditable="true">Transfer to Bank Account</span>
-        </div>
-        <div class="detail-row">
-            <span class="label">Transaction No.</span>
-            <span class="value" contenteditable="true">2601220296369965886095460</span>
-        </div>
-        <div class="detail-row">
-            <span class="label">Payment Method</span>
-            <span class="value" contenteditable="true">Wallet</span>
-        </div>
-        <div class="detail-row">
-            <span class="label">Transaction Date</span>
-            <span class="value" contenteditable="true">Jan 22, 2026, 17:31</span>
-        </div>
-        <div class="detail-row">
-            <span class="label" style="min-width: 80px;">Session ID</span>
-            <span class="value" contenteditable="true" style="font-size: 11px;">1003310260122132006151604358838</span>
         </div>
     </div>
 
@@ -226,7 +238,27 @@
         <button class="btn btn-outline" onclick="window.print()">Print / Save PDF</button>
         <button class="btn btn-solid">Share Receipt</button>
     </div>
+
 </div>
+
+<script>
+function openGallery() {
+    document.getElementById('galleryInput').click();
+}
+
+document.getElementById('galleryInput').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        document.getElementById('bankImage').src = reader.result;
+        document.getElementById('bankImage').style.display = 'block';
+        document.getElementById('bankEmoji').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+});
+</script>
 
 </body>
 </html>
