@@ -1,264 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Transaction Receipt</title>
-    <style>
-        :root {
-            --bg-color: #0b0b0b;
-            --card-bg: #161616;
-            --primary-green: #00d285;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --border-color: #262626;
-        }
+I want it when I click it will take me my gallery
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Edit Transaction Receipt</title>  
+    <style>  
+        :root {  
+            --bg-color: #0b0b0b;  
+            --card-bg: #161616;  
+            --primary-green: #00d285;  
+            --text-main: #ffffff;  
+            --text-muted: #888888;  
+            --border-color: #262626;  
+        }  body {  
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;  
+        background-color: var(--bg-color);  
+        color: var(--text-main);  
+        margin: 0;  
+        display: flex;  
+        flex-direction: column;  
+        align-items: center;  
+        padding: 20px;  
+    }  
 
-        .edit-hint {
-            background: #222;
-            color: var(--primary-green);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-bottom: 20px;
-            border: 1px solid var(--primary-green);
-        }
+    /* Instruction Badge */  
+    .edit-hint {  
+        background: #222;  
+        color: var(--primary-green);  
+        padding: 8px 15px;  
+        border-radius: 20px;  
+        font-size: 12px;  
+        margin-bottom: 20px;  
+        border: 1px solid var(--primary-green);  
+    }  
 
-        .receipt-container {
-            width: 100%;
-            max-width: 400px;
-        }
+    .receipt-container {  
+        width: 100%;  
+        max-width: 400px;  
+    }  
 
-        [contenteditable="true"]:focus {
-            outline: 1px dashed var(--primary-green);
-            background: rgba(0, 210, 133, 0.05);
-            padding: 2px;
-        }
+    /* Content Editable Focus Style */  
+    [contenteditable="true"]:focus {  
+        outline: 1px dashed var(--primary-green);  
+        background: rgba(0, 210, 133, 0.05);  
+        padding: 2px;  
+    }  
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 5px 20px;
-        }
+    .header {  
+        display: flex;  
+        justify-content: space-between;  
+        align-items: center;  
+        padding: 10px 5px 20px;  
+    }  
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 12px;
-        }
+    .card {  
+        background-color: var(--card-bg);  
+        border-radius: 15px;  
+        padding: 20px;  
+        margin-bottom: 12px;  
+    }  
 
-        .summary-section { text-align: center; }
+    .summary-section { text-align: center; }  
 
-        .icon-circle {
-            width: 55px;
-            height: 55px;
-            background: #1a2a24;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            border: 1px solid #005a3a;
-            cursor: pointer;
-        }
+    .icon-circle {  
+        width: 45px;  
+        height: 45px;  
+        background: #1a2a24;  
+        border-radius: 50%;  
+        display: flex;  
+        align-items: center;  
+        justify-content: center;  
+        margin: 0 auto 15px;  
+        border: 1px solid #005a3a;  
+    }  
 
-        .icon-circle img {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-            display: none;
-        }
+    .amount { font-size: 32px; font-weight: 700; margin: 5px 0; }  
+    .status { color: var(--primary-green); font-size: 14px; margin-bottom: 25px; }  
 
-        .amount { font-size: 32px; font-weight: 700; margin: 5px 0; }
-        .status { color: var(--primary-green); font-size: 14px; margin-bottom: 25px; }
+    .timeline {  
+        display: flex;  
+        justify-content: space-between;  
+        position: relative;  
+        margin-bottom: 25px;  
+        padding: 0 10px;  
+    }  
 
-        .timeline {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin-bottom: 25px;
-            padding: 0 10px;
-        }
+    .timeline::before {  
+        content: '';  
+        position: absolute;  
+        top: 9px;  
+        left: 15%;  
+        right: 15%;  
+        height: 2px;  
+        background: var(--primary-green);  
+    }  
 
-        .timeline::before {
-            content: '';
-            position: absolute;
-            top: 9px;
-            left: 15%;
-            right: 15%;
-            height: 2px;
-            background: var(--primary-green);
-        }
+    .step { position: relative; font-size: 10px; width: 30%; text-align: center; line-height: 1.4; }  
+    .dot {  
+        width: 18px;  
+        height: 18px;  
+        background: var(--primary-green);  
+        border-radius: 50%;  
+        margin: 0 auto 6px;  
+        display: flex;  
+        align-items: center;  
+        justify-content: center;  
+        color: #000;  
+        font-size: 10px;  
+        font-weight: bold;  
+    }  
 
-        .step {
-            position: relative;
-            font-size: 10px;
-            width: 30%;
-            text-align: center;
-            line-height: 1.4;
-        }
+    .detail-row {  
+        display: flex;  
+        justify-content: space-between;  
+        margin-bottom: 14px;  
+        font-size: 13px;  
+    }  
 
-        .dot {
-            width: 18px;
-            height: 18px;
-            background: var(--primary-green);
-            border-radius: 50%;
-            margin: 0 auto 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-size: 10px;
-            font-weight: bold;
-        }
+    .label { color: var(--text-muted); }  
+    .value { text-align: right; font-weight: 400; }  
 
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 14px;
-            font-size: 13px;
-        }
+    .divider { height: 1px; background: var(--border-color); margin: 15px 0; }  
 
-        .label { color: var(--text-muted); }
-        .value { text-align: right; font-weight: 400; }
+    .footer-btns { display: flex; gap: 10px; margin-top: 10px; }  
+    .btn {  
+        flex: 1;  
+        padding: 14px;  
+        border-radius: 25px;  
+        border: none;  
+        font-weight: bold;  
+        cursor: pointer;  
+        font-size: 14px;  
+    }  
+    .btn-outline { background: #1a1a1a; border: 1px solid #333; color: var(--primary-green); }  
+    .btn-solid { background: var(--primary-green); color: #000; }  
 
-        .footer-btns {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
+    @media print {  
+        .edit-hint, .footer-btns { display: none; }  
+        body { background: #000; }  
+    }  
+</style>
 
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: 25px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-        }
+</head>  
+<body>  <div class="edit-hint">✨ Tip: Click on any text to edit it</div>  <div class="receipt-container" id="receipt">  
+    <div class="header">  
+        <span style="font-size: 20px;">‹</span>  
+        <span style="font-weight: 500;">Transaction Details</span>  
+        <span style="color: var(--primary-green); font-size: 20px;">🎧</span>  
+    </div>  <div class="card summary-section">  
+    <div class="icon-circle">🏦</div>  
+    <div class="label">Transfer to <span contenteditable="true" style="color:white; font-weight: 500;">JOHN UNEKE OGBONNAYA</span></div>  
+    <div class="amount" contenteditable="true">₦10,000.00</div>  
+    <div class="status">Successful</div>  
 
-        .btn-outline {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: var(--primary-green);
-        }
+    <div class="timeline">  
+        <div class="step">  
+            <div class="dot">✓</div>  
+            Payment successful<br>  
+            <span class="label" contenteditable="true">01-22 17:31:49</span>  
+        </div>  
+        <div class="step">  
+            <div class="dot">✓</div>  
+            Processing by bank<br>  
+            <span class="label" contenteditable="true">01-22 17:31:51</span>  
+        </div>  
+        <div class="step">  
+            <div class="dot">✓</div>  
+            Received by bank<br>  
+            <span class="label" contenteditable="true">01-22 17:31:54</span>  
+        </div>  
+    </div>  
 
-        .btn-solid {
-            background: var(--primary-green);
-            color: #000;
-        }
+    <div class="detail-row">  
+        <span class="label">Amount</span>  
+        <span class="value" contenteditable="true">₦10,000.00</span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label">Fee</span>  
+        <span class="value" contenteditable="true">₦0.00</span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label">Amount Paid</span>  
+        <span class="value" contenteditable="true">₦10,000.00</span>  
+    </div>  
+</div>  
 
-        @media print {
-            .edit-hint, .footer-btns { display: none; }
-            body { background: #000; }
-        }
-    </style>
-</head>
-<body>
+<div class="card">  
+    <div class="detail-row">  
+        <span class="label">Recipient Details</span>  
+        <span class="value">  
+            <div contenteditable="true" style="font-weight: 500;">JOHN</div>  
+            <div class="label" contenteditable="true">Opay | 6104165496</div>  
+        </span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label">Transaction Type</span>  
+        <span class="value" contenteditable="true">Transfer to Bank Account</span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label">Transaction No.</span>  
+        <span class="value" contenteditable="true">2601220296369965886095460</span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label">Payment Method</span>  
+        <span class="value" contenteditable="true">Wallet</span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label">Transaction Date</span>  
+        <span class="value" contenteditable="true">Jan 22, 2026, 17:31</span>  
+    </div>  
+    <div class="detail-row">  
+        <span class="label" style="min-width: 80px;">Session ID</span>  
+        <span class="value" contenteditable="true" style="font-size: 11px;">1003310260122132006151604358838</span>  
+    </div>  
+</div>  
 
-<div class="edit-hint">✨ Tip: Click on any text to edit it</div>
-
-<div class="receipt-container">
-
-    <div class="header">
-        <span style="font-size:20px;">‹</span>
-        <span style="font-weight:500;">Transaction Details</span>
-        <span style="color:var(--primary-green); font-size:20px;">🎧</span>
-    </div>
-
-    <div class="card summary-section">
-
-        <!-- CLICKABLE ICON -->
-        <div class="icon-circle" onclick="openGallery()">
-            <span id="bankEmoji">🏦</span>
-            <img id="bankImage" alt="Bank Logo">
-        </div>
-
-        <input type="file" id="galleryInput" accept="image/*" hidden>
-
-        <div class="label">
-            Transfer to
-            <span contenteditable="true" style="color:white; font-weight:500;">
-                JOHN UNEKE OGBONNAYA
-            </span>
-        </div>
-
-        <div class="amount" contenteditable="true">₦10,000.00</div>
-        <div class="status">Successful</div>
-
-        <div class="timeline">
-            <div class="step">
-                <div class="dot">✓</div>
-                Payment successful<br>
-                <span class="label" contenteditable="true">01-22 17:31:49</span>
-            </div>
-            <div class="step">
-                <div class="dot">✓</div>
-                Processing by bank<br>
-                <span class="label" contenteditable="true">01-22 17:31:51</span>
-            </div>
-            <div class="step">
-                <div class="dot">✓</div>
-                Received by bank<br>
-                <span class="label" contenteditable="true">01-22 17:31:54</span>
-            </div>
-        </div>
-
-        <div class="detail-row">
-            <span class="label">Amount</span>
-            <span class="value" contenteditable="true">₦10,000.00</span>
-        </div>
-
-        <div class="detail-row">
-            <span class="label">Fee</span>
-            <span class="value" contenteditable="true">₦0.00</span>
-        </div>
-
-        <div class="detail-row">
-            <span class="label">Amount Paid</span>
-            <span class="value" contenteditable="true">₦10,000.00</span>
-        </div>
-    </div>
-
-    <div class="footer-btns">
-        <button class="btn btn-outline" onclick="window.print()">Print / Save PDF</button>
-        <button class="btn btn-solid">Share Receipt</button>
-    </div>
-
+<div class="footer-btns">  
+    <button class="btn btn-outline" onclick="window.print()">Print / Save PDF</button>  
+    <button class="btn btn-solid">Share Receipt</button>  
 </div>
 
-<script>
-function openGallery() {
-    document.getElementById('galleryInput').click();
-}
-
-document.getElementById('galleryInput').addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-        document.getElementById('bankImage').src = reader.result;
-        document.getElementById('bankImage').style.display = 'block';
-        document.getElementById('bankEmoji').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-});
-</script>
-
-</body>
-</html>
+</div>  </body>  
+</html>  
