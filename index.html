@@ -3,268 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binance Admin Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <title>Edit Transaction Receipt</title>
     <style>
         :root {
-            --binance-bg: #181a20;
-            --binance-gray: #848e9c;
-            --binance-green: #0ecb81;
-            --sidebar-bg: #1e2329;
-            --sidebar-active: #2b3139;
+            --bg-color: #0b0b0b;
+            --card-bg: #161616;
+            --primary-green: #00d285;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-color: #262626;
         }
 
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            height: 100vh;
-            background: #0b0e11;
-            color: white;
-            overflow: hidden;
-        }
-
-        /* --- Admin Sidebar (Image 1000713987) --- */
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid #2d333c;
             display: flex;
             flex-direction: column;
-            padding: 24px;
-        }
-
-        .brand {
-            display: flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            color: #fcd535;
-            margin-bottom: 40px;
+            padding: 20px;
         }
 
-        .nav-item {
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: var(--binance-gray);
-            cursor: pointer;
-            margin-bottom: 4px;
-            transition: 0.2s;
+        /* Instruction Badge */
+        .edit-hint {
+            background: #222;
+            color: var(--primary-green);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--primary-green);
         }
 
-        .nav-item.active { background: var(--sidebar-active); color: white; }
-
-        /* --- Workspace --- */
-        .workspace {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 420px 1fr;
-            padding: 30px;
-            gap: 30px;
-            overflow-y: auto;
-        }
-
-        .admin-card {
-            background: var(--sidebar-bg);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid #2d333c;
-            height: fit-content;
-        }
-
-        .input-group { margin-bottom: 18px; }
-        label { display: block; font-size: 11px; color: var(--binance-gray); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
-        input {
+        .receipt-container {
             width: 100%;
-            padding: 12px;
-            background: #0b0e11;
-            border: 1px solid #474d57;
-            color: white;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            max-width: 400px;
         }
 
-        /* --- Real Binance Canvas (Image 1000714012) --- */
-        .canvas {
+        /* Content Editable Focus Style */
+        [contenteditable="true"]:focus {
+            outline: 1px dashed var(--primary-green);
+            background: rgba(0, 210, 133, 0.05);
+            padding: 2px;
+        }
+
+        .header {
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px 20px;
         }
 
-        .binance-mobile {
-            width: 375px;
-            background: var(--binance-bg);
-            min-height: 700px;
-            border-radius: 30px;
-            padding: 20px 24px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-            position: relative;
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 12px;
         }
 
-        .amount-header {
-            text-align: center;
-            margin: 40px 0 30px;
-        }
+        .summary-section { text-align: center; }
 
-        .amt-val { font-size: 32px; font-weight: 600; }
-        .amt-unit { font-size: 16px; margin-left: 4px; }
-        
-        .status-badge {
+        .icon-circle {
+            width: 45px;
+            height: 45px;
+            background: #1a2a24;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            color: var(--binance-green);
-            font-weight: 500;
-            margin-top: 12px;
-            font-size: 15px;
+            margin: 0 auto 15px;
+            border: 1px solid #005a3a;
         }
 
-        .info-note {
-            text-align: center;
-            color: var(--binance-gray);
-            font-size: 13px;
-            line-height: 1.5;
-            margin: 20px 0;
+        .amount { font-size: 32px; font-weight: 700; margin: 5px 0; }
+        .status { color: var(--primary-green); font-size: 14px; margin-bottom: 25px; }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 25px;
             padding: 0 10px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 9px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: var(--primary-green);
+        }
+
+        .step { position: relative; font-size: 10px; width: 30%; text-align: center; line-height: 1.4; }
+        .dot {
+            width: 18px;
+            height: 18px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 24px;
-            font-size: 14px;
-            align-items: flex-start;
-        }
-
-        .detail-label { color: var(--binance-gray); }
-        .detail-val { 
-            text-align: right; 
-            font-weight: 500; 
-            max-width: 200px;
-            word-break: break-all;
-            font-family: 'Roboto Mono', monospace;
+            margin-bottom: 14px;
             font-size: 13px;
         }
 
-        .copy-icon {
-            width: 14px;
-            opacity: 0.5;
-            margin-left: 6px;
-            vertical-align: middle;
+        .label { color: var(--text-muted); }
+        .value { text-align: right; font-weight: 400; }
+
+        .divider { height: 1px; background: var(--border-color); margin: 15px 0; }
+
+        .footer-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
         }
+        .btn-outline { background: #1a1a1a; border: 1px solid #333; color: var(--primary-green); }
+        .btn-solid { background: var(--primary-green); color: #000; }
 
         @media print {
-            .sidebar, .admin-card, label { display: none !important; }
-            body { background: white; }
-            .workspace { display: block; padding: 0; }
-            .binance-mobile { box-shadow: none; border-radius: 0; margin: 0 auto; }
+            .edit-hint, .footer-btns { display: none; }
+            body { background: #000; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="brand">🏦 BANK ADMIN</div>
-        <div class="nav-item active">Dashboard</div>
-        <div class="nav-item">Transaction History</div>
-        <div class="nav-item">Account Settings</div>
-        <div class="nav-item">Security Log</div>
+<div class="edit-hint">✨ Tip: Click on any text to edit it</div>
+
+<div class="receipt-container" id="receipt">
+    <div class="header">
+        <span style="font-size: 20px;">‹</span>
+        <span style="font-weight: 500;">Transaction Details</span>
+        <span style="color: var(--primary-green); font-size: 20px;">🎧</span>
     </div>
 
-    <main class="workspace">
-        <div class="admin-card">
-            <h3 style="margin-top:0; font-weight: 500;">Binance TRC20 Controller</h3>
-            
-            <div class="input-group">
-                <label>Amount (USDT)</label>
-                <input type="text" id="in_amt" value="200" oninput="sync()">
+    <div class="card summary-section">
+        <div class="icon-circle">🏦</div>
+        <div class="label">Transfer to <span contenteditable="true" style="color:white; font-weight: 500;">JOHN UNEKE OGBONNAYA</span></div>
+        <div class="amount" contenteditable="true">₦10,000.00</div>
+        <div class="status">Successful</div>
+
+        <div class="timeline">
+            <div class="step">
+                <div class="dot">✓</div>
+                Payment successful<br>
+                <span class="label" contenteditable="true">01-22 17:31:49</span>
             </div>
-
-            <div class="input-group">
-                <label>Withdrawal Address</label>
-                <input type="text" id="in_addr" value="TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe" oninput="sync()">
+            <div class="step">
+                <div class="dot">✓</div>
+                Processing by bank<br>
+                <span class="label" contenteditable="true">01-22 17:31:51</span>
             </div>
-
-            <div class="input-group">
-                <label>Transaction ID (Txid)</label>
-                <input type="text" id="in_txid" value="d19ab87001c89954beae4a5ffb03b61e0cb0470c8a84cf93164885b5c60a5774" oninput="sync()">
-            </div>
-
-            <div class="input-group">
-                <label>Network Fee</label>
-                <input type="text" id="in_fee" value="1.1 USDT" oninput="sync()">
-            </div>
-
-            <button onclick="window.print()" style="width:100%; padding:14px; background:#fcd535; color:black; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
-                Export Mobile View
-            </button>
-        </div>
-
-        <div class="canvas">
-            <div class="binance-mobile">
-                <div style="text-align: center; color: var(--binance-gray); font-size: 12px;">Amount</div>
-                
-                <div class="amount-header">
-                    <span class="amt-val" id="out_amt">200</span><span class="amt-unit">USDT</span>
-                    <div class="status-badge">
-                        <span style="font-size:18px;">✔</span> Completed
-                    </div>
-                </div>
-
-                <div class="info-note">
-                    Crypto transferred out of Binance account. Please contact the recipient platform for your transaction receipt.
-                    <div style="color:#fcd535; margin-top:10px; font-weight:500;">Why hasn't my withdrawal arrived?</div>
-                </div>
-
-                <div style="margin-top:40px;">
-                    <div class="detail-row">
-                        <span class="detail-label">Confirmations</span>
-                        <span class="detail-val">1 / 1</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Withdrawal Wallet</span>
-                        <span class="detail-val">Spot Wallet</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Network</span>
-                        <span class="detail-val">TRC20</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Address</span>
-                        <span class="detail-val" id="out_addr">TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe ❐</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Txid</span>
-                        <span class="detail-val" id="out_txid">d19ab87001c89954beae4a5ffb03b61e0cb0470c8a84cf93164885b5c60a5774 ❐</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Network Fee</span>
-                        <span class="detail-val" id="out_fee">1.1 USDT</span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">Date</span>
-                        <span class="detail-val">2026-02-06 21:28:25</span>
-                    </div>
-                </div>
+            <div class="step">
+                <div class="dot">✓</div>
+                Received by bank<br>
+                <span class="label" contenteditable="true">01-22 17:31:54</span>
             </div>
         </div>
-    </main>
 
-    <script>
-        function sync() {
-            document.getElementById('out_amt').innerText = document.getElementById('in_amt').value;
-            document.getElementById('out_addr').innerText = document.getElementById('in_addr').value + " ❐";
-            document.getElementById('out_txid').innerText = document.getElementById('in_txid').value + " ❐";
-            document.getElementById('out_fee').innerText = document.getElementById('in_fee').value;
-        }
-    </script>
+        <div class="detail-row">
+            <span class="label">Amount</span>
+            <span class="value" contenteditable="true">₦10,000.00</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Fee</span>
+            <span class="value" contenteditable="true">₦0.00</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Amount Paid</span>
+            <span class="value" contenteditable="true">₦10,000.00</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="detail-row">
+            <span class="label">Recipient Details</span>
+            <span class="value">
+                <div contenteditable="true" style="font-weight: 500;">JOHN</div>
+                <div class="label" contenteditable="true">Opay | 6104165496</div>
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Transaction Type</span>
+            <span class="value" contenteditable="true">Transfer to Bank Account</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Transaction No.</span>
+            <span class="value" contenteditable="true">2601220296369965886095460</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Payment Method</span>
+            <span class="value" contenteditable="true">Wallet</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Transaction Date</span>
+            <span class="value" contenteditable="true">Jan 22, 2026, 17:31</span>
+        </div>
+        <div class="detail-row">
+            <span class="label" style="min-width: 80px;">Session ID</span>
+            <span class="value" contenteditable="true" style="font-size: 11px;">1003310260122132006151604358838</span>
+        </div>
+    </div>
+
+    <div class="footer-btns">
+        <button class="btn btn-outline" onclick="window.print()">Print / Save PDF</button>
+        <button class="btn btn-solid">Share Receipt</button>
+    </div>
+</div>
+
 </body>
 </html>
