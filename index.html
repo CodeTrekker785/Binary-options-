@@ -6,286 +6,282 @@
     <title>Bank Admin Dashboard</title>
     <style>
         :root {
-            --primary-blue: #2563eb;
-            --success-green: #10b981;
-            --dark-bg: #111827;
-            --sidebar-bg: #1f2937;
-            --input-bg: #374151;
-            --bofa-blue: #002652;
+            --sidebar-bg: #1e293b;
+            --main-bg: #0f172a;
+            --accent-blue: #2563eb;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --success: #10b981;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--main-bg);
+            color: #f8fafc;
             display: flex;
             height: 100vh;
-            background-color: var(--dark-bg);
-            color: white;
+            overflow: hidden;
         }
 
-        /* --- Sidebar UI --- */
+        /* --- Navigation Sidebar --- */
         .sidebar {
             width: 280px;
             background-color: var(--sidebar-bg);
-            padding: 20px;
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #374151;
+            padding: 24px;
         }
 
-        .sidebar h2 {
-            color: var(--primary-blue);
-            font-size: 1.2rem;
+        .brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--accent-blue);
+            margin-bottom: 40px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 12px;
         }
 
         .nav-item {
-            padding: 12px 15px;
+            padding: 12px 16px;
             border-radius: 8px;
-            margin-bottom: 8px;
+            color: #94a3b8;
             cursor: pointer;
-            color: #9ca3af;
-            transition: 0.3s;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
         }
 
-        .nav-item.active {
-            background-color: var(--primary-blue);
-            color: white;
-        }
+        .nav-item:hover { background: #334155; color: white; }
+        .nav-item.active { background: var(--accent-blue); color: white; }
 
-        /* --- Main Layout --- */
-        .main-content {
+        /* --- Dashboard Workspace --- */
+        .workspace {
             flex: 1;
-            display: flex;
-            padding: 30px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 500px;
             gap: 30px;
             overflow-y: auto;
         }
 
-        .controls {
-            flex: 1;
-            max-width: 400px;
-        }
+        .dashboard-main { display: flex; flex-direction: column; gap: 24px; }
 
-        .card {
-            background: var(--sidebar-bg);
-            padding: 20px;
+        .balance-widget {
+            background: var(--card-bg);
+            padding: 24px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #374151;
+            border: 1px solid var(--border-color);
         }
 
-        .balance-card h3 { color: #9ca3af; margin: 0; font-size: 0.9rem; }
-        .balance-card h1 { margin: 10px 0 0 0; font-size: 2rem; color: var(--success-green); }
+        .balance-label { color: #94a3b8; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .balance-value { font-size: 2.5rem; font-weight: bold; color: var(--success); margin: 8px 0; }
 
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #9ca3af; }
+        .form-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group.full { grid-column: span 2; }
+        
+        label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
+        
         input, select {
             width: 100%;
-            padding: 10px;
-            background: var(--input-bg);
-            border: 1px solid #4b5563;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 12px;
             border-radius: 6px;
             color: white;
+            font-size: 0.9rem;
             box-sizing: border-box;
         }
 
-        /* --- Receipt Design --- */
-        .receipt-container {
-            width: 500px;
-            background: white;
-            color: #333;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            min-height: 800px;
-        }
-
-        .receipt-logo { text-align: center; margin-bottom: 20px; }
-        .receipt-logo img { width: 250px; }
-        .receipt-title { text-align: center; font-weight: bold; margin-bottom: 20px; }
-
-        .receipt-border-box {
-            border: 1.5px solid #777;
-            padding: 15px;
-            font-size: 13px;
-        }
-
-        .section-header {
-            background: #999;
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-blue);
             color: white;
-            padding: 4px 10px;
-            display: inline-block;
-            font-weight: bold;
-            margin: 15px 0 0 0;
-        }
-
-        .data-table {
-            width: 100%;
-            border: 1px solid #777;
-            border-collapse: collapse;
-        }
-
-        .data-table td { padding: 6px 10px; font-size: 12px; }
-        .label-col { width: 40%; color: #555; }
-        .value-col { font-weight: bold; text-align: left; }
-
-        .footer-box {
-            margin-top: 20px;
-            border: 1px solid #777;
-            padding: 15px;
-            font-size: 11px;
-            line-height: 1.4;
-        }
-
-        .btn-print {
-            width: 100%;
-            padding: 15px;
-            background: var(--success-green);
             border: none;
             border-radius: 8px;
-            color: white;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             margin-top: 10px;
         }
 
+        /* --- Receipt Document Preview --- */
+        .preview-pane { display: flex; flex-direction: column; align-items: center; }
+
+        .document {
+            width: 100%;
+            background: white;
+            color: #1e293b;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            min-height: 650px;
+            box-sizing: border-box;
+        }
+
+        /* Internal Receipt Styles */
+        .receipt-header { text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+        .bank-logo { font-size: 20px; font-weight: 800; color: #002652; text-transform: uppercase; }
+        .receipt-box { border: 1.5px solid #64748b; padding: 15px; margin-top: 10px; }
+        .table-header { background: #94a3b8; color: white; font-weight: bold; padding: 4px 10px; font-size: 12px; display: inline-block; margin-top: 15px; }
+        .data-table { width: 100%; border-collapse: collapse; border: 1px solid #64748b; }
+        .data-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+        .footer-legal { border: 1px solid #64748b; padding: 12px; margin-top: 20px; font-size: 10px; line-height: 1.4; }
+
         @media print {
-            .sidebar, .controls { display: none; }
+            .sidebar, .dashboard-main, .action-btn { display: none; }
             body { background: white; }
-            .receipt-container { box-shadow: none; width: 100%; padding: 0; margin: 0; }
+            .workspace { display: block; padding: 0; }
+            .document { box-shadow: none; border: none; width: 100%; }
         }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>🏦 BANK ADMIN</h2>
+        <div class="brand"><span>🏦</span> BANK ADMIN</div>
         <div class="nav-item active">Dashboard</div>
         <div class="nav-item">Transaction History</div>
         <div class="nav-item">Account Settings</div>
         <div class="nav-item">Security Log</div>
     </div>
 
-    <div class="main-content">
-        <div class="controls">
-            <div class="card balance-card">
-                <h3>Total Portfolio Balance</h3>
-                <h1 id="sidebar_bal_display">$1,240,550.00</h1>
+    <main class="workspace">
+        <div class="dashboard-main">
+            <div class="balance-widget">
+                <div class="balance-label">Current Dashboard Balance</div>
+                <div class="balance-value" id="dash_bal_view">$1,240,550.00</div>
             </div>
 
-            <div class="card">
-                <div class="input-group">
-                    <label>Network / Bank</label>
-                    <select id="bank_select" onchange="updateReceipt()">
-                        <option value="BOFA">Bank of America</option>
-                        <option value="PAYPAL">PayPal</option>
-                        <option value="BNB">Binance (BNB)</option>
-                    </select>
+            <div class="form-card">
+                <h3 style="margin-top:0">Receipt Management</h3>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Select Financial Institution</label>
+                        <select id="in_bank" onchange="sync()">
+                            <option value="BOFA">Bank of America</option>
+                            <option value="PAYPAL">PayPal Global</option>
+                            <option value="BNB">Binance Smart Chain (BNB)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Name</label>
+                        <input type="text" id="in_name" value="JANNAH MUHAMMAD" oninput="sync()">
+                    </div>
+                    <div class="form-group">
+                        <label>Dashboard Balance</label>
+                        <input type="text" id="in_bal" value="$1,240,550.00" oninput="sync()">
+                    </div>
+                    <div class="form-group">
+                        <label>Transfer Amount</label>
+                        <input type="text" id="in_amt" value="569,523.27" oninput="sync()">
+                    </div>
+                    <div class="form-group">
+                        <label>Beneficiary</label>
+                        <input type="text" id="in_ben" value="Bilal Hassan Ranjha" oninput="sync()">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Dashboard Balance</label>
-                    <input type="text" id="in_dash_bal" value="$1,240,550.00" oninput="updateReceipt()">
-                </div>
-                <div class="input-group">
-                    <label>Beneficiary Name</label>
-                    <input type="text" id="in_ben" value="Bilal Hassan Ranjha" oninput="updateReceipt()">
-                </div>
-                <div class="input-group">
-                    <label>Amount</label>
-                    <input type="text" id="in_amt" value="569,523.27" oninput="updateReceipt()">
-                </div>
-                <button class="btn-print" onclick="window.print()">Download Receipt (PDF)</button>
-            </div>
-        </div>
-
-        <div class="receipt-container" id="printable_receipt">
-            <div class="receipt-logo">
-                <h2 id="receipt_bank_name" style="color:var(--bofa-blue); margin:0;">BANK OF AMERICA</h2>
-            </div>
-            <div class="receipt-title">Receipt</div>
-
-            <div class="receipt-border-box">
-                <div style="text-align:center; margin-bottom:15px;">
-                    Transaction receipt for within <span id="receipt_network">SNB</span> funds transfer<br>
-                    Prepared for <strong>JANNAH MUHAMMAD</strong> on <strong>25/06/2025 at 8:56:47</strong>
-                </div>
-
-                <div style="font-size:12px; margin-bottom:10px;">
-                    Dear Customer,<br><br>
-                    Your transaction has been successfully completed.<br>
-                    Bank Reference: <span style="margin-left:50px;">3653357356800344</span>
-                </div>
-
-                <div class="section-header">From</div>
-                <table class="data-table">
-                    <tr><td class="label-col">Currency</td><td class="value-col" id="curr_1">PKR</td></tr>
-                    <tr><td class="label-col">Account number</td><td class="value-col">03202400710</td></tr>
-                    <tr><td class="label-col">Amount</td><td class="value-col" id="amt_1">Rs. 569,523.27</td></tr>
-                </table>
-
-                <div class="section-header">To</div>
-                <table class="data-table">
-                    <tr><td class="label-col">Currency</td><td class="value-col" id="curr_2">PKR</td></tr>
-                    <tr><td class="label-col">Beneficiary</td><td class="value-col" id="out_ben">Bilal Hassan Ranjha</td></tr>
-                    <tr><td class="label-col">Credit Amount</td><td class="value-col" id="amt_2">Rs. 569,523.27</td></tr>
-                </table>
-            </div>
-
-            <div class="footer-box">
-                <strong id="footer_bank">The USA National Bank</strong><br>
-                A USA Joint Stock Company<br>
-                Paid Up Capital: <span id="footer_cap">Rs,197,000.00</span><br>
-                Commercial Registration 4030001588<br>
-                <span style="font-size:9px; color:#666;">Under the supervision and control of The USA Central Bank</span>
+                <button class="action-btn" onclick="window.print()">Generate & Print PDF</button>
             </div>
         </div>
-    </div>
+
+        <div class="preview-pane">
+            <label style="margin-bottom: 10px;">Generated Receipt Preview</label>
+            <div class="document" id="doc">
+                <div class="receipt-header">
+                    <div class="bank-logo" id="out_bank">BANK OF AMERICA</div>
+                    <div style="font-size: 11px; margin-top: 5px;">Electronic Funds Transfer Receipt</div>
+                </div>
+
+                <div class="receipt-box">
+                    <div style="text-align:center; font-size:12px; margin-bottom:15px;">
+                        Transaction for <span id="out_net">SNB</span> network transfer<br>
+                        Prepared for <strong id="out_name">JANNAH MUHAMMAD</strong><br>
+                        Ref: 3653357356800344
+                    </div>
+
+                    <div class="table-header">Source Account</div>
+                    <table class="data-table">
+                        <tr><td>Currency</td><td style="font-weight:bold; text-align:right" id="out_curr1">PKR</td></tr>
+                        <tr><td>Amount</td><td style="font-weight:bold; text-align:right"><span class="sym">Rs.</span> <span id="out_amt1">569,523.27</span></td></tr>
+                    </table>
+
+                    <div class="table-header">Recipient Details</div>
+                    <table class="data-table">
+                        <tr><td>Beneficiary</td><td style="font-weight:bold; text-align:right" id="out_ben">Bilal Hassan Ranjha</td></tr>
+                        <tr><td>Total Credit</td><td style="font-weight:bold; text-align:right"><span class="sym">Rs.</span> <span id="out_amt2">569,523.27</span></td></tr>
+                    </table>
+                </div>
+
+                <div class="footer-legal">
+                    <strong id="out_foot_bank">The USA National Bank</strong><br>
+                    A USA Joint Stock Company. Registered Commercial Registration 4030001588. 
+                    This document is an official record of transfer.
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
-        function updateReceipt() {
-            const bank = document.getElementById('bank_select').value;
+        function sync() {
+            const bank = document.getElementById('in_bank').value;
+            const name = document.getElementById('in_name').value;
+            const bal = document.getElementById('in_bal').value;
             const amt = document.getElementById('in_amt').value;
             const ben = document.getElementById('in_ben').value;
-            const dashBal = document.getElementById('in_dash_bal').value;
 
-            // Update Dashboard Balance
-            document.getElementById('sidebar_bal_display').innerText = dashBal;
+            // Update Dashboard Balance View
+            document.getElementById('dash_bal_view').innerText = bal;
 
-            // Logic for different banks
-            if(bank === "PAYPAL") {
-                document.getElementById('receipt_bank_name').innerText = "PayPal";
-                document.getElementById('receipt_bank_name').style.color = "#003087";
-                document.getElementById('receipt_network').innerText = "Digital Wallet";
-                document.getElementById('curr_1').innerText = "USD";
-                document.getElementById('curr_2').innerText = "USD";
-                document.getElementById('amt_1').innerText = "$" + amt;
-                document.getElementById('amt_2').innerText = "$" + amt;
-                document.getElementById('footer_bank').innerText = "PayPal Holdings, Inc.";
-            } else if(bank === "BNB") {
-                document.getElementById('receipt_bank_name').innerText = "BINANCE";
-                document.getElementById('receipt_bank_name').style.color = "#F3BA2F";
-                document.getElementById('receipt_network').innerText = "BEP-20";
-                document.getElementById('curr_1').innerText = "BNB";
-                document.getElementById('curr_2').innerText = "BNB";
-                document.getElementById('amt_1').innerText = amt + " BNB";
-                document.getElementById('amt_2').innerText = amt + " BNB";
-                document.getElementById('footer_bank').innerText = "Binance Global Ledger";
-            } else {
-                document.getElementById('receipt_bank_name').innerText = "BANK OF AMERICA";
-                document.getElementById('receipt_bank_name').style.color = "#002652";
-                document.getElementById('receipt_network').innerText = "SNB";
-                document.getElementById('curr_1').innerText = "PKR";
-                document.getElementById('curr_2').innerText = "PKR";
-                document.getElementById('amt_1').innerText = "Rs. " + amt;
-                document.getElementById('amt_2').innerText = "Rs. " + amt;
-                document.getElementById('footer_bank').innerText = "The USA National Bank";
-            }
-
+            // Update Receipt
+            document.getElementById('out_name').innerText = name;
             document.getElementById('out_ben').innerText = ben;
+            document.getElementById('out_amt1').innerText = amt;
+            document.getElementById('out_amt2').innerText = amt;
+
+            // Bank Specific Logic
+            const bName = document.getElementById('out_bank');
+            const bFoot = document.getElementById('out_foot_bank');
+            const bNet = document.getElementById('out_net');
+            const bCurr = document.getElementById('out_curr1');
+            const syms = document.querySelectorAll('.sym');
+
+            if (bank === 'PAYPAL') {
+                bName.innerText = "PayPal";
+                bName.style.color = "#003087";
+                bFoot.innerText = "PayPal Holdings, Inc.";
+                bNet.innerText = "PayPal Internal";
+                bCurr.innerText = "USD";
+                syms.forEach(s => s.innerText = "$");
+            } else if (bank === 'BNB') {
+                bName.innerText = "BINANCE";
+                bName.style.color = "#F3BA2F";
+                bFoot.innerText = "Binance Global Smart Chain";
+                bNet.innerText = "BEP-20 Smart Chain";
+                bCurr.innerText = "BNB";
+                syms.forEach(s => s.innerText = "BNB ");
+            } else {
+                bName.innerText = "BANK OF AMERICA";
+                bName.style.color = "#002652";
+                bFoot.innerText = "The USA National Bank";
+                bNet.innerText = "SNB";
+                bCurr.innerText = "PKR";
+                syms.forEach(s => s.innerText = "Rs.");
+            }
         }
+        
+        // Initial sync
+        sync();
     </script>
 </body>
 </html>
