@@ -3,65 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Admin | Multi-Template Suite</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <title>Binance Admin Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --admin-dark: #1a222f;
-            --admin-blue: #2563eb;
             --binance-bg: #181a20;
-            --bofa-text: #333333;
+            --binance-gray: #848e9c;
+            --binance-green: #0ecb81;
+            --sidebar-bg: #1e2329;
+            --sidebar-active: #2b3139;
         }
 
-        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: #0f172a; color: white; overflow: hidden; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            background: #0b0e11;
+            color: white;
+            overflow: hidden;
+        }
 
-        /* --- Admin Sidebar (Matches Image 1000713987) --- */
-        .sidebar { width: 280px; background: var(--admin-dark); border-right: 1px solid #2d3748; padding: 25px; box-sizing: border-box; }
-        .sidebar h2 { font-size: 1rem; color: var(--admin-blue); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .nav-item { padding: 12px 16px; border-radius: 10px; color: #94a3b8; cursor: pointer; margin-bottom: 5px; font-weight: 500; }
-        .nav-item.active { background: var(--admin-blue); color: white; }
+        /* --- Admin Sidebar (Image 1000713987) --- */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #2d333c;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #fcd535;
+            margin-bottom: 40px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--binance-gray);
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: 0.2s;
+        }
+
+        .nav-item.active { background: var(--sidebar-active); color: white; }
 
         /* --- Workspace --- */
-        .workspace { flex: 1; display: grid; grid-template-columns: 400px 1fr; gap: 25px; padding: 25px; overflow-y: auto; }
-        .panel { background: #1e293b; padding: 25px; border-radius: 16px; border: 1px solid #334155; height: fit-content; }
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            padding: 30px;
+            gap: 30px;
+            overflow-y: auto;
+        }
+
+        .admin-card {
+            background: var(--sidebar-bg);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #2d333c;
+            height: fit-content;
+        }
+
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 11px; color: var(--binance-gray); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #0b0e11;
+            border: 1px solid #474d57;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- Real Binance Canvas (Image 1000714012) --- */
+        .canvas {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .binance-mobile {
+            width: 375px;
+            background: var(--binance-bg);
+            min-height: 700px;
+            border-radius: 30px;
+            padding: 20px 24px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .amount-header {
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+
+        .amt-val { font-size: 32px; font-weight: 600; }
+        .amt-unit { font-size: 16px; margin-left: 4px; }
         
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; box-sizing: border-box; }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--binance-green);
+            font-weight: 500;
+            margin-top: 12px;
+            font-size: 15px;
+        }
 
-        /* --- Receipt Canvas --- */
-        .canvas { display: flex; justify-content: center; align-items: flex-start; }
-        .receipt-paper { width: 100%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .info-note {
+            text-align: center;
+            color: var(--binance-gray);
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 20px 0;
+            padding: 0 10px;
+        }
 
-        /* --- Bank of America Style (Image 1000713960) --- */
-        .bofa-card { background: white; color: var(--bofa-text); padding: 40px; font-family: Arial, sans-serif; }
-        .bofa-logo { text-align: center; margin-bottom: 20px; }
-        .bofa-logo img { width: 280px; }
-        .bofa-main-box { border: 1.5px solid #888; padding: 20px; font-size: 13px; line-height: 1.5; }
-        .bofa-tag { background: #a6a6a6; color: white; font-weight: bold; padding: 4px 12px; display: inline-block; margin-top: 15px; }
-        .bofa-table { width: 100%; border-collapse: collapse; border: 1px solid #888; margin-top: 2px; }
-        .bofa-table td { padding: 8px; border-bottom: 1px solid #eee; }
-        .bofa-footer { border: 1px solid #888; padding: 15px; margin-top: 25px; font-size: 11px; }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 14px;
+            align-items: flex-start;
+        }
 
-        /* --- Binance Style (Image 1000714012) --- */
-        .bn-card { background: var(--binance-bg); color: #eaecef; padding: 30px; border-radius: 24px; min-height: 700px; }
-        .bn-status { color: #0ecb81; font-weight: 600; text-align: center; margin: 15px 0; font-size: 18px; }
-        .bn-row { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; }
-        .bn-label { color: #848e9c; }
-        .bn-val { font-family: 'Roboto Mono', monospace; font-size: 13px; text-align: right; max-width: 220px; word-break: break-all; }
+        .detail-label { color: var(--binance-gray); }
+        .detail-val { 
+            text-align: right; 
+            font-weight: 500; 
+            max-width: 200px;
+            word-break: break-all;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+        }
+
+        .copy-icon {
+            width: 14px;
+            opacity: 0.5;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
 
         @media print {
-            .sidebar, .panel, label { display: none !important; }
+            .sidebar, .admin-card, label { display: none !important; }
             body { background: white; }
             .workspace { display: block; padding: 0; }
-            .receipt-paper { box-shadow: none; border-radius: 0; }
+            .binance-mobile { box-shadow: none; border-radius: 0; margin: 0 auto; }
         }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>🏦 BANK ADMIN</h2>
+        <div class="brand">🏦 BANK ADMIN</div>
         <div class="nav-item active">Dashboard</div>
         <div class="nav-item">Transaction History</div>
         <div class="nav-item">Account Settings</div>
@@ -69,107 +174,97 @@
     </div>
 
     <main class="workspace">
-        <div class="panel">
-            <h3 style="margin-top:0">Template Controller</h3>
+        <div class="admin-card">
+            <h3 style="margin-top:0; font-weight: 500;">Binance TRC20 Controller</h3>
             
             <div class="input-group">
-                <label>Select active bank</label>
-                <select id="bank_selector" onchange="render()">
-                    <option value="BOFA">Bank of America (Formal)</option>
-                    <option value="BNB">Binance (Crypto Tx)</option>
-                </select>
+                <label>Amount (USDT)</label>
+                <input type="text" id="in_amt" value="200" oninput="sync()">
             </div>
 
             <div class="input-group">
-                <label>Amount</label>
-                <input type="text" id="in_amt" value="569,523.27" oninput="render()">
+                <label>Withdrawal Address</label>
+                <input type="text" id="in_addr" value="TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe" oninput="sync()">
             </div>
 
             <div class="input-group">
-                <label>Beneficiary / Address</label>
-                <input type="text" id="in_ben" value="Bilal Hassan Ranjha" oninput="render()">
+                <label>Transaction ID (Txid)</label>
+                <input type="text" id="in_txid" value="d19ab87001c89954beae4a5ffb03b61e0cb0470c8a84cf93164885b5c60a5774" oninput="sync()">
             </div>
 
             <div class="input-group">
-                <label>Reference / TxID</label>
-                <input type="text" id="in_ref" value="3653357356800344" oninput="render()">
+                <label>Network Fee</label>
+                <input type="text" id="in_fee" value="1.1 USDT" oninput="sync()">
             </div>
 
-            <button onclick="window.print()" style="width:100%; padding:15px; background:var(--admin-blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">
-                Download Official PDF
+            <button onclick="window.print()" style="width:100%; padding:14px; background:#fcd535; color:black; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
+                Export Mobile View
             </button>
         </div>
 
         <div class="canvas">
-            <div id="receipt_target" class="receipt-paper">
+            <div class="binance-mobile">
+                <div style="text-align: center; color: var(--binance-gray); font-size: 12px;">Amount</div>
+                
+                <div class="amount-header">
+                    <span class="amt-val" id="out_amt">200</span><span class="amt-unit">USDT</span>
+                    <div class="status-badge">
+                        <span style="font-size:18px;">✔</span> Completed
+                    </div>
                 </div>
+
+                <div class="info-note">
+                    Crypto transferred out of Binance account. Please contact the recipient platform for your transaction receipt.
+                    <div style="color:#fcd535; margin-top:10px; font-weight:500;">Why hasn't my withdrawal arrived?</div>
+                </div>
+
+                <div style="margin-top:40px;">
+                    <div class="detail-row">
+                        <span class="detail-label">Confirmations</span>
+                        <span class="detail-val">1 / 1</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Withdrawal Wallet</span>
+                        <span class="detail-val">Spot Wallet</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Network</span>
+                        <span class="detail-val">TRC20</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Address</span>
+                        <span class="detail-val" id="out_addr">TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe ❐</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Txid</span>
+                        <span class="detail-val" id="out_txid">d19ab87001c89954beae4a5ffb03b61e0cb0470c8a84cf93164885b5c60a5774 ❐</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Network Fee</span>
+                        <span class="detail-val" id="out_fee">1.1 USDT</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Date</span>
+                        <span class="detail-val">2026-02-06 21:28:25</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        function render() {
-            const bank = document.getElementById('bank_selector').value;
-            const amt = document.getElementById('in_amt').value;
-            const ben = document.getElementById('in_ben').value;
-            const ref = document.getElementById('in_ref').value;
-            const target = document.getElementById('receipt_target');
-
-            if (bank === "BOFA") {
-                target.innerHTML = `
-                    <div class="bofa-card">
-                        <div class="bofa-logo">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Bank_of_America_logo.svg/2560px-Bank_of_America_logo.svg.png" alt="BoA">
-                            <div style="font-size:12px; margin-top:5px;">Receipt</div>
-                        </div>
-                        <div class="bofa-main-box">
-                            <div style="text-align:center; margin-bottom:15px;">
-                                Transaction receipt for within <strong>SNB</strong> funds transfer<br>
-                                Prepared for <strong>JANNAH MUHAMMAD</strong> on 25/06/2025
-                            </div>
-                            Your transaction has been successfully completed.<br>
-                            Bank Reference: <span style="float:right">${ref}</span><br>
-                            <span style="font-size:11px; color:#666;">Thank you for using AlAhli Mobile Service.</span>
-
-                            <div class="bofa-tag">From</div>
-                            <table class="bofa-table">
-                                <tr><td>Currency</td><td style="text-align:right"><strong>PKR</strong></td></tr>
-                                <tr><td>Amount</td><td style="text-align:right"><strong>Rs. ${amt}</strong></td></tr>
-                            </table>
-
-                            <div class="bofa-tag">To</div>
-                            <table class="bofa-table">
-                                <tr><td>Beneficiary</td><td style="text-align:right"><strong>${ben}</strong></td></tr>
-                                <tr><td>Credit Amount</td><td style="text-align:right"><strong>Rs. ${amt}</strong></td></tr>
-                            </table>
-                        </div>
-                        <div class="bofa-footer">
-                            <strong>The USA National Bank</strong><br>
-                            A USA Joint Stock Company. Paid Up Capital: Rs,197,000.00<br>
-                            <span style="font-size:10px;">Commercial Registration 4030001588</span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                target.innerHTML = `
-                    <div class="bn-card">
-                        <div style="text-align:center; color:#848e9c; font-size:12px;">Amount</div>
-                        <div style="text-align:center; font-size:32px; font-weight:600; margin-top:10px;">${amt} <span style="font-size:16px;">USDT</span></div>
-                        <div class="bn-status">✔ Completed</div>
-                        <div style="color:#848e9c; font-size:13px; text-align:center; margin:20px 0;">
-                            Crypto transferred out of Binance account.
-                        </div>
-                        <div style="margin-top:40px;">
-                            <div class="bn-row"><span class="bn-label">Network</span><span class="bn-val">TRC20</span></div>
-                            <div class="bn-row"><span class="bn-label">Address</span><span class="bn-val">${ben}</span></div>
-                            <div class="bn-row"><span class="bn-label">Txid</span><span class="bn-val">${ref}</span></div>
-                            <div class="bn-row"><span class="bn-label">Network Fee</span><span class="bn-val">1.1 USDT</span></div>
-                            <div class="bn-row"><span class="bn-label">Date</span><span class="bn-val">2026-02-06 21:28:25</span></div>
-                        </div>
-                    </div>
-                `;
-            }
+        function sync() {
+            document.getElementById('out_amt').innerText = document.getElementById('in_amt').value;
+            document.getElementById('out_addr').innerText = document.getElementById('in_addr').value + " ❐";
+            document.getElementById('out_txid').innerText = document.getElementById('in_txid').value + " ❐";
+            document.getElementById('out_fee').innerText = document.getElementById('in_fee').value;
         }
-        render();
     </script>
 </body>
 </html>
